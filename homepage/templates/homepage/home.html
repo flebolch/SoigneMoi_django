@@ -1,0 +1,120 @@
+
+{% extends 'homepage/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- about us -->
+  
+    <div class="bg-light bg-primary py-3 py-sm-5 mt-4">
+      <div class="container">
+
+
+        <div class="row align-items-center">
+          <div class="col-12 col-lg-6 ">
+            <h1 class="display-1">Notre Hopital</h1>
+            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nec ante eros. Phasellus posuere magna in nunc maximus, sed elementum tortor faucibus.</p>
+            <a href="#soins" class="btn btn-lg btn-primary me-2">En savoir plus</a>
+            <a href="#contact" class="btn btn-lg btn-outline-primary mt-1">Nous contacter</a>
+          </div>
+          <div class="col-12 col-lg-6 mb-3 mb-lg-0">
+            <img src="static/elements/Images/hopital modern.jpg" alt="samuel-scalzo" class="img-fluid mt-1 rounded">
+          </div>
+        </div>
+
+
+    </div>
+
+    <!-- end about us -->
+
+    <!-- about our services -->
+
+    <div id="soins" class="bg-light py-3 py-sm-5">
+      <div class="container">
+        <div  class="row align-items-center ">
+        <h1 class="display-1">Nos offres de soins</h1>
+        <div class="row py-3">
+
+        
+         {% for service in services %}
+          <div class="col-12 col-md-6 col-lg-3 mb-4">
+            <div class="card">
+              <img src="{{ service.image.url }}" class="rounded-top ">
+              <div class="card-body">
+                <h5 class="card-title">{{ service.name }}</h5>
+                <p class="card-text">{{ service.description|truncatechars:100 }}</p>
+                <a href="#" class="btn btn-primary">Prendre Rendez-vous</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- End of cards  -->
+
+        <!-- Start of Contact -->
+
+        <div class="bg-light bg-primary py-3 py-sm-5">
+          <div  id="contact" class="container">
+          <h1 class="text-center mb-sm-4 display-1">Contact</h1>
+       
+          <div class="row">
+            <div class="col-12 col-lg-6 mb-3">
+
+              <h2>Address:</h2>
+              <address>
+                <strong>Notre Hopital</strong><br>
+                Rue<br>
+                Code postal<br>
+                <i class="fas fa-fw fa-phone"></i> <a href="tel:+1234567890">(01) 4720001</a><br>
+                <i class="fas fa-fw fa-envelope"></i> <a href="mailto:info@domain.com">info@domain.com</a>
+              </address>
+
+              <h2>Heures de visite:</h2>
+              <p>
+                  <div class="container text-center">
+                <div class="row">
+                  <div class="col text-start">
+                    
+                    <p>
+                      Lundi-Vendredi:<br>
+                      Samedi:<br>
+                      Dimanche:<br>
+                    </p>
+                  </div>
+
+                    <div class="col text-start">
+                      
+                      <p>
+                        8h - 18h<br>
+                        10h - 16h<br>
+                        10h - 14h<br>
+                      </p>
+                    </div>
+
+              </div>
+            </div>
+              
+
+            </div>
+            <div class="col-12 col-lg-6">
+              <h2>Nous trouver:</h2>
+              <div class="ratio ratio-4x3">
+                      
+                      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d40509.96582864853!2d2.9584854486328185!3d50.61089990000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c2d5103447dfd7%3A0xab5633f5f6257936!2sCentre%20Hospitalier%20Universitaire%20de%20Lille!5e0!3m2!1sfr!2sfr!4v1701656606322!5m2!1sfr!2sfr" ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+
+
+      </div>
+      </div>
+    </div>
+
+    <!-- end of contact -->
+
+
+    {% endblock %}
