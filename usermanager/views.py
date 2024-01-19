@@ -14,7 +14,7 @@ def register (request):
            user = Account.objects.create_user(username=username, first_name=first_name, last_name=last_name, password=password)
            print(user)
            user.save()
-           return redirect('home')
+           return redirect('connection')
        else:
             print(f"Form errors: {form.errors}")
             print(f"Form errors: {form.non_field_errors}")
