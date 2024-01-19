@@ -6,16 +6,14 @@ from django.db.models.signals import post_save
 # Create your models here.
 
 class MyAccountManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None):
-        if not email:
-            raise ValueError('User must have an email address')
+    def create_user(self, first_name, last_name, username, password=None):
+
 
         if not username:
             raise ValueError('User must have an username')
 
         user = self.model(
-            email = self.normalize_email(email),
-            username = username,
+            username = self.normalize_email(username),
             first_name = first_name,
             last_name = last_name,
         )
@@ -24,10 +22,10 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, first_name, last_name, email, username, password):
+    def create_superuser(self, first_name, last_name, username, password):
             user = self.create_user(
-                email = self.normalize_email(email),
-                username = username,
+                username = self.normalize_email(username),
+
                 password = password,
                 first_name = first_name,
                 last_name = last_name,
@@ -41,8 +39,7 @@ class MyAccountManager(BaseUserManager):
 class Account(AbstractBaseUser):
     first_name      =models.CharField(max_length=50)
     last_name       =models.CharField(max_length=50)
-    email           =models.EmailField(verbose_name="email", max_length=60, unique=True)
-    username        =models.EmailField(max_length=60, unique=True)
+    username        =models.CharField(max_length=150, unique=True)
 
     #required
     date_joined     =models.DateTimeField(auto_now_add=True)
@@ -52,8 +49,8 @@ class Account(AbstractBaseUser):
     is_active       =models.BooleanField(default=False)
 
    
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS =['username', 'first_name','last_name']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS =[ 'first_name','last_name']
 
     objects = MyAccountManager()
 
@@ -61,7 +58,7 @@ class Account(AbstractBaseUser):
         return f'{self.first_name} {self.last_name}'
 
     def __str__(self):
-        return self.email
+        return self.username
     
     def has_perm(self, perm, obj=None):
         return self.is_admin
@@ -83,7 +80,7 @@ class DoctorProfile(models.Model):
         verbose_name_plural = 'doctor profiles'
 
     def __str__(self):
-        return self.user.email
+        return self.user.username
     
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name
@@ -102,7 +99,7 @@ class PatientProfile(models.Model):
         verbose_name_plural = 'visitor profiles'
 
     def __str__(self):
-        return self.user.email
+        return self.user.username
 
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name
@@ -120,7 +117,7 @@ class SecretaryProfile(models.Model):
         verbose_name_plural = 'secretary profiles'
 
     def __str__(self):
-        return self.user.email
+        return self.user.username
     
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name
@@ -134,7 +131,7 @@ class PlanningManagerProfile(models.Model):
         verbose_name_plural = 'planning manager profiles'
 
     def __str__(self):
-        return self.user.email
+        return self.user.username
     
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name

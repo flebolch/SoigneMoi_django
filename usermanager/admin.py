@@ -4,8 +4,9 @@ from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
 class AccountAdmin(UserAdmin):
-    list_display = ('email', 'first_name', 'last_name', 'date_joined', 'last_login','is_active')
-    search_fields = ('email', 'first_name', 'last_name')
+    list_display = ('username', 'first_name', 'last_name', 'date_joined', 'last_login','is_active')
+    list_display_links = ('username', 'first_name', 'last_name')
+    search_fields = ('username', 'first_name', 'last_name')
     readonly_fields = ('date_joined', 'last_login')
     ordering = ('-date_joined',)
 

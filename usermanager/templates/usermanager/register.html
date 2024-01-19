@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static '/elements/logo/soignemoi-favicon-color.ico' %}">
+
+  </head>
+  <body>
+
+
+    <!-- start of register form -->
+
+
+<section class="section-content padding-y">
+
+    <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+        <article class="card-body text-center">
+            <header class="mb-2"><h3 class="card-title">Créer votre compte SoigneMoi</h3></header>
+            <p class="pt-4 mb-4 pb-2">
+                Pour créer votre compte SoigneMoi, veuillez renseigner les
+                champs ci-dessous.
+              </p>
+		<form action="{% url 'nouveau_patient' %}" method="POST" class="form-control form-control-lg py-2 gap-4 text-start">
+      {% csrf_token %}
+
+
+
+          <div class="form-group">
+              <label class="mt-1 mb-1">Nom</label>
+              {{ form.first_name }}
+              <label class="mt-1 mb-1">prénom</label>
+              {{ form.last_name }}
+              <label class="mt-1 mb-1">Email</label>
+              {{ form.username }}
+              <labe class="mt-1 mb-1"l>Mot de passe</label>
+              {{ form.password }}
+              <label class="mt-1 mb-1">Confirmer le mot de passe</label>
+              {{ form.confirm_password }}
+              <div class="form-group mt-4">
+                <button type="submit" class="btn btn-warning btn-lg btn-block w-100"> Register  </button>
+              </div>
+            </div>
+    </form>
+            </div>
+            </div>
+
+        </article>
+            
+        <div class="text-center py-2">
+          Vous avez déjà un compte ? <a href="{% url 'connection' %}">Connectez-vous</a>
+        </div>
+
+
+    </div>
+
+</section>
+
+    <!-- end of register form -->
+
+  </body>
+</html>
