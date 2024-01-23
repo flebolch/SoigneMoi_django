@@ -30,10 +30,18 @@
 
 
           <div class="form-group">
-              <label class="mt-1 mb-1">Nom</label>
-              {{ form.first_name }}
-              <label class="mt-1 mb-1">prénom</label>
-              {{ form.last_name }}
+          
+
+              <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <label for="id_first_name">Nom</label>
+                    {{ form.first_name }}
+                </div>
+                <div>
+                    <label for="id_last_name">Prénom</label>
+                    {{ form.last_name }}
+                </div>
+              </div>
               <label class="mt-1 mb-1">Email</label>
               {{ form.username }}
               <labe class="mt-1 mb-1"l>Mot de passe</label>

@@ -1,66 +1,50 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Home - Small Business</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css" />
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="/elements/logo/soignemoi-favicon-color.ico"
-    />
-    <script defer src="js/fontawesome-all.min.js"></script>
-    <style>
-      body {
-        padding-top: 57px;
-      }
-    </style>
+    <title></title>
+    <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static '/elements/logo/soignemoi-favicon-color.ico' %}">
+
   </head>
   <body>
 
 
-    <section class="vh-100" style="bg-light;">
-        <div class="container py-5 h-100">
-          <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-              <div class="card shadow-2-strong" style="border-radius: 1rem;">
-                <div class="card-body p-5 text-center">
-      
-                  <h3 class="mb-2">Vous avez déjà un compte SoigneMoi</h3>
-                  <hr class="my-4">
-      
-                  <div class="form-outline mb-4">
-                    <input type="email" id="typeEmailX-2" class="form-control form-control-lg" placeholder="Email associé à votre compte SoigneMoi" />
-                    <!-- <label class="form-label" for="typeEmailX-2">Email</label> -->
-                  </div>
-      
-                  <div class="form-outline mb-4">
-                    <input type="password" id="typePasswordX-2" class="form-control form-control-lg" placeholder="Mot de passe"/>
-                  </div>
-      
-                  <!-- Checkbox -->
-                  <div class="form-check d-flex justify-content-start mb-4 gap-2">
-                    <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
-                    <label class="form-check-label" for="form1Example3"> Rester connecté </label>
-                  </div>
-      
-                  <!-- Submit button -->
-                  <hr class="my-4">
-                  <button class="btn btn-warning btn-lg btn-block w-100" type="submit">Connection</button>
-                  <hr class="my-4">
-                  <a href="#soins" class="nav-link"><h4 class="mb-3"><u>Mot de passe oublié ?</u></h4></a>
-                  <hr class="my-4">
-                  <h3 class="mb-2">Vous n'avez pas encore de compte?</h3>
-                  <a href="#soins" class="nav-link"><h4 class="mb-1"><u>Créer un compte SoigneMoi</u></h4></a>
-                  
-      
-                </div>
-              </div>
-            </div>
+
+    <!-- start of login form -->
+
+    <section class="section-content padding-y">
+
+      <div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+          <article class="card-body text-center">
+              <header class="mb-2"><h3 class="card-title">Vous avez déjà un compte SoigneMoi?</h3></header>
+              <p class="pt-4 mb-4 pb-2">
+                  Pour vous connecter à votre espace utilisateur, entrez le mail et le mot de passe associés à votre compte SoigneMoi.
+                </p>
+          <form action="{% url 'connection' %}" method="POST" class="form-control form-control-lg py-2 gap-4 text-start">
+        {% csrf_token %}
+
+        <div class="fomr-group">
+          <label class="mt-1 mb-1">Email</label>
+            <input type="email" class="form-control" placeholder="Email Address" name="email" required>
+          <label class="mt-1 mb-1">Mot de passe</label>
+            <input type="password" class="form-control" placeholder="Password" name="password" required>
+          <div class="form-group mt-4">
+            <button type="submit" class="btn btn-warning btn-lg btn-block w-100">Se connecter</button>
           </div>
         </div>
-      </section> 
+          </form>
+              </div>
+              </div>
+
+          </article>
+              
+          <div class="text-center py-2">
+            Vous n'avez pas encore de compte ? <a href="{% url 'nouveau_patient' %}">Créez-en un</a>
+          </div>
+    </section> 
 
   </body>
 </html>

@@ -11,6 +11,11 @@ class RegistrationForm(forms.ModelForm):
         'class': 'form-control',
     }))
 
+    username = forms.EmailField(widget=forms.EmailInput(attrs={
+        'placeholder': 'Adresse email',
+        'class': 'form-control',
+    }))
+
     class Meta:
         model = Account
         fields = ( 'username', 'first_name', 'last_name','password')
@@ -18,9 +23,9 @@ class RegistrationForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(RegistrationForm, self).clean()
         username = cleaned_data.get('email')
-        # cleaned_data['username'] = email
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
+
 
         if password != confirm_password:
             raise forms.ValidationError(
@@ -32,7 +37,7 @@ class RegistrationForm(forms.ModelForm):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['placeholder'] = 'Adresse email'
         self.fields['first_name'].widget.attrs['placeholder'] = 'Nom d\'utilisateur'
-        self.fields['last_name'].widget.attrs['placeholder'] = 'Prénom'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Prénom d\'utilisateur'
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
 
