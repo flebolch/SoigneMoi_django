@@ -46,10 +46,9 @@
               <p class="card-text">
                 {{ service.description|truncatechars:100 }}
               </p>
-              <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseService{{ service.id }}" aria-expanded="false" aria-controls="collapseService{{ service.id }}">
-                Plus de détails
-              </a>
-              <a href="{{ service.slug }}" class="btn btn-primary">page service</a>
+              <div class="text-center mt-1">
+                <a href="{{ service.slug }}" class="btn btn-primary">Plus de détails</a>
+              </div>
             </div>
           </div>
         </div>
@@ -61,29 +60,6 @@
 
 <!-- End of cards -->
 
-<!-- test details -->
-
-<div class="container">
-  {% for service in services %}
-  <div class="collapse" id="collapseService{{ service.id }}" class="bg-light bg-primary py-3 py-sm-5 mt-4">
-    <div id="serviceDetails" class="row align-items-center">
-      <div class="col-12 col-lg-6 mb-3 mb-lg-0">
-        <img src="{{ service.image.url }}" alt="samuel-scalzo" class="img-fluid mt-1 rounded" />
-      </div>
-      <div class="col-12 col-lg-6">
-        <h1 class="display-1">{{ service.name }}</h1>
-        <p class="lead">
-          {{ service.description }}
-        </p>
-        <a href="#contact" class="btn btn-lg btn-outline-primary mt-1 aligne-items-center">Prende rendez-vous</a>
-      </div>
-    </div>
-    <p>Test </p>
-  </div>
-  {% endfor %}
-</div>
-
-<!-- end of test details -->
 
 <!-- Start of Contact -->
 

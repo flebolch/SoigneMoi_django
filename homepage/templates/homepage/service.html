@@ -1,38 +1,58 @@
 {% extends 'homepage/base.html' %} {% load static %} {% block content %}
 
+<!-- details of service -->
 
-<div class="bg-light bg-primary py-3 py-sm-5 mt-4">
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-
-                <img src="{{ services.image }}" alt="{{ services.name }}" class="img-fluid">
-
-                <h1>{{ services.name }}</h1>
+<div class="container">
+    <div class="bg-light bg-primary py-3 py-sm-5 mt-4">
+        <div id="serviceDetails" class="row align-items-center">
+            <div class="col-md-12 col-lg-6">
+                <h1 class="display-1">{{ services.name }}</h1>
                 <p>{{ services.description }}</p>
-                <h1>Nom du service :</h1>
-                <p>{{ services.name }}</p>
-                <div>
-                    <p> liste des interventions proposées : </p>
-                    <ul>
+            </div>
+            <div class="col-md-12 col-lg-6">
+                <img src="{{ services.image.url }}" alt="{{ services.name }}" class="img-fluid">
+            </div>
+            <h2 class="mt-4">Type d'interventions proposées par le service {{ services.name }}:</h2>
+            <div>
+                <table class="table table-sm mt-2">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Nombre de d'hospitalisation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for intervention in interventions %}
-                        <li>{{ intervention.name }}</li>
+                        <tr>
+                            <td>{{ intervention.name }}</td>
+                            <td>{{ intervention.description }}</td>
+                            <td>{{ intervention.duration }}</td>
+                        </tr>
                         {% endfor %}
-                    </ul>
-                </div>
-                <div>
-                    <p>Liste des docteurs :</p>
-                    <ul>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h2 class="mt-4">Liste des médecins en {{ services.name }}:</h2>
+                <ul>
                     {% for doctor in doctors %}
-                    <li>{{ doctor.fullname }}</li>
+                    <li class="mt-2">
+                        <p class="fw-bold">{{ doctor.fullname }} <span class="text-center fw-normal"> - {{
+                                doctor.qualification }}</span></p>
+                    </li>
                     {% endfor %}
                 </ul>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'home' %}#soins" class="btn btn-primary">Retour à la liste des services</a>
+                </div>
+
             </div>
-            
-        </div>
         </div>
     </div>
 </div>
+
+<!-- end of service details -->
 
 {% endblock %}
