@@ -30,6 +30,8 @@
 
 <!-- about our services -->
 
+<!-- about our services -->
+
 <div id="soins" class="bg-light py-3 py-sm-5">
   <div class="container">
     <div class="row align-items-center">
@@ -44,29 +46,27 @@
               <p class="card-text">
                 {{ service.description|truncatechars:100 }}
               </p>
-              <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseService"
-                aria-expanded="false" aria-controls="collapseService"  onclick="location.href='#collapseService'">
+              <a href="#" class="btn btn-primary" data-toggle="collapse" data-target="#collapseService{{ service.id }}" aria-expanded="false" aria-controls="collapseService{{ service.id }}">
                 Plus de détails
-              </button>
+              </a>
+              <a href="{{ service.slug }}" class="btn btn-primary">page service</a>
             </div>
           </div>
         </div>
-
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
 
-<!-- End of cards  -->
+<!-- End of cards -->
 
+<!-- test details -->
 
-<!-- test details  -->
-
-<div class="collapse" id='collapseService' class="bg-light bg-primary py-3 py-sm-5 mt-4">
-  <div class="container">
+<div class="container">
+  {% for service in services %}
+  <div class="collapse" id="collapseService{{ service.id }}" class="bg-light bg-primary py-3 py-sm-5 mt-4">
     <div id="serviceDetails" class="row align-items-center">
-      {% for service in services %}
       <div class="col-12 col-lg-6 mb-3 mb-lg-0">
         <img src="{{ service.image.url }}" alt="samuel-scalzo" class="img-fluid mt-1 rounded" />
       </div>
@@ -77,12 +77,10 @@
         </p>
         <a href="#contact" class="btn btn-lg btn-outline-primary mt-1 aligne-items-center">Prende rendez-vous</a>
       </div>
-      {% endfor %}
     </div>
     <p>Test </p>
-
-
   </div>
+  {% endfor %}
 </div>
 
 <!-- end of test details -->

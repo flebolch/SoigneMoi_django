@@ -1,0 +1,38 @@
+{% extends 'homepage/base.html' %} {% load static %} {% block content %}
+
+
+<div class="bg-light bg-primary py-3 py-sm-5 mt-4">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                <img src="{{ services.image }}" alt="{{ services.name }}" class="img-fluid">
+
+                <h1>{{ services.name }}</h1>
+                <p>{{ services.description }}</p>
+                <h1>Nom du service :</h1>
+                <p>{{ services.name }}</p>
+                <div>
+                    <p> liste des interventions proposées : </p>
+                    <ul>
+                        {% for intervention in interventions %}
+                        <li>{{ intervention.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <p>Liste des docteurs :</p>
+                    <ul>
+                    {% for doctor in doctors %}
+                    <li>{{ doctor.fullname }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+        </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
