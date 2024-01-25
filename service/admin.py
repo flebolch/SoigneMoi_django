@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Service, Intervention
+from .models import Service, Intervention, Doctor_TMP
 
 # Register your models here.
 class ServiceAdmin(admin.ModelAdmin):
@@ -17,7 +17,16 @@ class InterventionAdmin(admin.ModelAdmin):
 
     def short_description(self, obj):
         return obj.description[:30]
+    
+# Class TMP 
+class DoctorAdmin(admin.ModelAdmin):
+    list_display = ('fullname', 'qualification', 'service')
+    list_filter = ('service',)
+    search_fields = ('fullname', 'service__name')
+
 
 
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(Intervention, InterventionAdmin)
+admin.site.register(Doctor_TMP, DoctorAdmin)
+admin.site.site_header = 'Administration de la clinique'

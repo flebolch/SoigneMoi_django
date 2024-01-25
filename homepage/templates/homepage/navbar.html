@@ -1,24 +1,27 @@
+{% load django_htmx %}
+ {% load static %}
+  {% block content %}
  <!-- start of the navbarre -->
 
- <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom fixed-top shadow mb-sm-4">
+ <nav id='navbar' class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom fixed-top shadow mb-sm-4">
     <div class="container ">
-      <a href="index.html" class="navbar-brand">
-        <img src="static/elements/logo/soignemoi-high-resolution-logo-white-transparent.png" width="30%" height="30%" class="d-inline-block align-top" alt="">
+      <a href="#" class="navbar-brand">
+        <img src="{% static '/elements/logo/soignemoi-high-resolution-logo-white-transparent.png' %}" width="30%" height="30%" class="d-inline-block align-top" alt="">
       </a>
-      <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button> -->
       <div class="collapse navbar-collapse ms-auto" id="navbarCollapse">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <ul class="navbar-nav me-2 mb-2 mb-lg-0 mr-2 .list-group-item">
           <li class="nav-item">
-            <a href="index.html" class="nav-link active" aria-current="page">Home</a>
-          </li>
+            <a
 
-          <li class="nav-item">
-            <a href="#soins" class="nav-link">Services</a>
+            href="#hopital" class="nav-link list-group-item text-light active" aria-current="hopital">Home</a>
           </li>
+      
           <li class="nav-item">
-            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#soins" class="nav-link list-group-item text-light">Services</a>
+          </li>
+      
+          <li class="nav-item">
+            <a href="#contact" class="nav-link list-group-item text-light">Contact</a>
           </li>
         </ul>
       </div>
@@ -29,4 +32,11 @@
     </div>
   </nav>
 
-<!-- end of the navbarre -->
+  <style> 
+    #nav-link-active.htmx-added{
+      color: var(--bs-navbar-active-color);
+    }
+  </style>
+  <!-- end of the navbarre -->
+  
+  {% endblock %}
