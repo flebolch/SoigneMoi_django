@@ -1,0 +1,56 @@
+{% load static %} {% block content %}
+
+<!-- start my appointment -->
+<h1 class="text-center">Mes mes-rendez-vous</h1>
+<h2> Bonjour {{ patient }}</h2>
+<h3>Voici la liste de vos rendez-vous:</h3>
+
+
+
+<div class="container"> 
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Tous mes rendez-vous :</div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nom du Docteur</th>
+                                <th>Type d'intervention</th>
+                                <th>Date de début du séjour</th>
+                                <th>Date de fin du séjour</th>
+                                <th>Durée du séjour</th>
+                            </tr>
+                        </thead>
+                            {% if all_appointments.count == 0 %}
+                                <p>Vous n'avez pas encore de rendez-vous pour le moment</p>
+                            {% endif %}
+                            {% for appointment in current_appointments %}
+                        <tbody>
+                                
+                                <tr>
+                                    <td>{{ appointment.doctor }}</td>
+                                    <td>{{ appointment.intervention }}</td>
+                                    <td>{{ appointment.date_start }}</td>
+                                    <td>{{ appointment.date_stop }}</td>
+                                    <td>{{ appointment.duration }}</td>
+
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<!-- end my appointment  -->
+
+{% endblock %}
