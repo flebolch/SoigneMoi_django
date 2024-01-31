@@ -26,3 +26,13 @@ class GetInterventions(View):
             print(data_service)
             return JsonResponse(data_service)
         return HttpResponse("This is not an ajax request")
+    
+class GetDoctors(View):
+    def get(self, request, service, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            service = Service_temp.objects.get(id=service)
+            doctors = DoctorProfile_temp.objects.filter(service=service).order_by('doctorFullName')
+            data_doctors = {'doctors': list(doctors.values('id', 'doctorFullName', 'speciality'))}
+            print(data_doctors)
+            return JsonResponse(data_doctors)
+        return HttpResponse("This is not an ajax request")

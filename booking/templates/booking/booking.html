@@ -51,13 +51,24 @@
                 {% endfor %}
               </select>
             </div>
+
             <div class=" form-group validate my-2 mx-2">
               <p>Sélectionnez le type de soin :</p>
-
               <select class="form-select" aria-label="Select Service" name="intervention">
                 <option value="">Choisir une intervention</option>
                 {% for intervention in interventions %}
                 <option value="{{ intervention.id }}">{{ intervention.name }} - {{ intervention.duration }} jours
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class=" form-group validate my-2 mx-2">
+              <p>Sélectionnez le médecin :</p>
+              <select class="form-select" aria-label="Select Service" name="doctor">
+                <option value="">Choisir un docteur</option>
+                {% for doctor in doctors %}
+                <option value="{{ doctor.id }}">{{ doctor.doctorFullName }} - {{ doctor.speciality }}
                 </option>
                 {% endfor %}
               </select>
