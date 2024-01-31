@@ -1,15 +1,24 @@
-// jquery ready start
 $(document).ready(function() {
-
-    // Bootstrap tooltip
-    if($('[data-toggle="tooltip"]').length > 0) {  // check if element exists
-        $('[data-toggle="tooltip"]').tooltip();  // initialize tooltip
-    }
-
-    // Toggle collapse on click
-    $("#toggle-btn").click(function(){
-        $("#toggle-example").collapse('toggle'); // toggle collapse
+    $("form select[name='service']").on("change", function () {
+        var $this = $(this);
+        if ($this.val() != "") {
+            $.ajax({
+                url: "/get-interventions/" + $this.val(),
+                type: "GET",
+                success: function (resp) {
+                    var $interventionDropdown = $("form select[name='intervention']");
+                    $interventionDropdown.empty();
+                    resp.interventions.forEach(function(intervention) {
+                        var optionText = intervention.name + " - " + intervention.duration + " jours";
+                        $interventionDropdown.append(new Option(optionText, intervention.id));
+                    });
+                },
+                error: function (resp) {
+                    console.log(resp);
+                },
+            });
+        } else {
+            $("form select[name='intervention']").empty();
+        }
     });
-
 });
-// jquery end
