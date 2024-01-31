@@ -19,5 +19,5 @@ class AppointmentForm(forms.ModelForm):
     def clean_date(self):
         date = self.cleaned_data['date']
         if date < timezone.now().date():
-            raise forms.ValidationError("The date cannot be in the past!")
+            raise forms.ValidationError("La date de début ne peut pas être dans le passé.")
         return date
