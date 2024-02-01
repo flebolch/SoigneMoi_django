@@ -1,0 +1,62 @@
+<h1> Appointment requested : </h1>
+<br>
+<table> 
+    <tr>
+        <th>Doctor name</th>
+        <th>Day start </th>
+        <th>day end</th>
+        <th>Number of slot requested</th>
+        <th>Nombre of slot available after date start</th>
+    </tr>
+    <tr>
+        <td>{{ doctor }}</td>
+        <td>{{ date_start }}</td>
+        <td>{{ date_stop }}</td>
+        <td>{{ number_slot }}</td>
+        <td>{{ duration_days }}</td>
+        <td>{{ available_slots_count }}</td>
+</table>
+
+<br>
+<br>
+<h1> appointment first choice </h1>
+
+{% for item in appointment_requested %}
+    {% if item in appointment_requested %}
+        <p>Timeslot ID: {{ item.id }}</p>
+        <p>Start Date: {{ item.slot_start }}</p>
+        <p>End Date: {{ item.slot_end }}</p>
+    {% endif %}
+{% endfor %}
+
+    {% if appointment_requested_available %}
+        <button type="submit" name="timeslot_id" value="{{ item.id }}">Confirmer le rendez-vous</button>
+    {% else %}
+        <p>{{ error_message_first_choice }}</p>
+    {% endif %}
+
+
+
+<br>
+<br>
+<h1> appointment other choice </h1>
+
+<br>
+<br>
+
+<h1> all slot available for this range after {{ date_start}} for {{ doctor }}</h1>
+<h2> Total {{ available_slots_count }} </h2>
+<table>
+    <tr>
+        <th>Day</th>
+        <th>Timeslot ID</th>
+        <th>Patients available</th>
+    </tr>
+    {% for timeslot in available_slots %}
+        <tr>
+            <td>{{ timeslot.TimeSlot_day }}</td>
+            <td>{{ timeslot.id }}</td>
+            <td>{{ timeslot.patient_available }}</td>
+        </tr>
+    {% endfor %}
+</table>
