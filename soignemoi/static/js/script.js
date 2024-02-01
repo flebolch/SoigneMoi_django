@@ -80,21 +80,56 @@ $(document).ready(function () {
     }
   );
 
+  //check dateStart value
+  $("form input[name='dateStart']").on("change", function () {
+    var $this = $(this);
+    if ($this.val() != "") {
+      $.ajax({
+        url: "/check-date_start/" + $this.val(),
+        type: "GET",
+        success: function (response) {
+          $("input[name='dateStart']").css("border-color", "green");
+        },
+        error: function (response) {
+          $("input[name='dateStart']").css("border-color", "red");
+        },
+      });
+    }
+  });
+
+  //check dateStop value
+  $("form input[name='dateStop']").on("change", function () {
+    var dateStop = new Date($(this).val());
+    var dateStart = new Date($("form input[name='dateStart']").val());
+
+    if (dateStop >= dateStart) {
+      $("input[name='dateStop']").css("border-color", "green");
+
+      // Calculate the difference in days
+      var diffTime = Math.abs(dateStop - dateStart);
+      var diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
+      diffDays = diffDays + 1;
+
+
+      // Display the difference in the <p name="dateDuration"></p> element
+      $("p[name='dateDuration']").text(diffDays + " jour(s)");
+    } else {
+      $("input[name='dateStop']").css("border-color", "red");
+    }
+  });
+
   //enable submit button appoinment_submit
 
   $("form input[name='dateStart'], form input[name='dateStop']").on(
     "change",
     function () {
-      console.log("The selected option has changed.");
-      console.log("change");
       var $selectedDateStart = $("form input[name='dateStart']").val();
       var $selectedDateStop = $("form input[name='dateStop']").val();
-      console.log($selectedDateStop);
       if ($selectedDateStart != "" && $selectedDateStop != "") {
         $("input[name='appoinment_submit']").removeAttr("disabled");
-    } else {
-      $("input[name='appoinment_submit']").attr("disabled", "disabled");
-    }
+      } else {
+        $("input[name='appoinment_submit']").attr("disabled", "disabled");
+      }
     }
   );
 

@@ -5,5 +5,5 @@ urlpatterns = [
     path('prendre-rendez-vous/<int:patient_id>/', views.booking, name='prendre-rendez-vous'),
     path('get-interventions/<int:service>/', views.GetInterventions.as_view(), name='interventions'),
     path('get-doctors/<int:service>/', views.GetDoctors.as_view(), name='doctors'),
-    # path('get-timeslots/<int:doctor>/<str:date>/', views.GetTimeSlots.as_view(), name='timeslots'),
+    path('check-date_start/<str:date>/', views.GetDate_Start.as_view(), name='date_start'),
 ]
