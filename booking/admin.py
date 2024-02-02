@@ -3,7 +3,7 @@ from .models import Service_temp, Intervention_temp, DoctorProfile_temp, Patient
 
 # Register your models here.
 class timeslotAdmin(admin.ModelAdmin):
-    list_display = ('TimeSlot_day', 'doctor', 'slot_start', 'slot_end', 'patient_available', 'is_available')
+    list_display = ('id', 'slot_start','TimeSlot_day', 'doctor', 'patient_available', 'is_available')
     list_filter = ['TimeSlot_day','doctor', 'slot_start', 'patient_available', 'is_available']
 
     filter_horizontal = ()

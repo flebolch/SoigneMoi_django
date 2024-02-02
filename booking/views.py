@@ -182,15 +182,23 @@ def GetMoreSlot(request, doctor_id, date_start, duration):
     return render(request, 'booking/moreslot.html', context)
 
 def find_consecutive_slots(available_slots, duration_days):
+    
+    
     for i in range(len(available_slots) - duration_days + 1):
         # Get a range of slots of length 'duration_days'
         slot_range = available_slots[i:i+duration_days]
         print(slot_range)
+       
+       # Check if the slots in the range are consecutive
+        is_consecutive = True
+        for j in range(duration_days - 1):
+            print(slot_range[j+1].slot_start - slot_range[j].slot_start)
+            if (slot_range[j+1].slot_start - slot_range[j].slot_start).days != 1:
+                is_consecutive = False
+                break
 
-        # Check if the slots in the range are consecutive
-        if all((slot_range[j+1].slot_start - slot_range[j].slot_start).days == 1 for j in range(duration_days - 1)):
-            # If they are, return the range
+        if is_consecutive:
+            print('len of slots :',len(slot_range))
             return slot_range
 
-    # If no available range is found, return None
     return None
