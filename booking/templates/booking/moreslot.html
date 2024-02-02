@@ -1,0 +1,69 @@
+{% load i18n %}
+
+<center>
+
+    <h3> Prochaine date disponnible</h3>
+    <br>
+    <table>
+        <tr>
+            <th>Nom du praticien</th>
+            <th>Date de début de séjour</th>
+            <th>Nombre de jour demandés</th>
+        </tr>
+        <tr>
+            <td>{{ doctor }}</td>
+            <td>{{ date_start|date:'l d F Y' }}</td>
+            <td>{{ duration_days }}</td>
+    </table>
+    <br>
+    <br>
+    <hr>
+    <br>
+    <br>
+    <h1> Debug </h1>
+
+    <h2> Prochain séjour disponnible après le {{ date_start }} avec le Docteur {{ doctor }}: </h2>
+
+    {% if appointment_seconde_choice_available %}
+    {{ appointment_seconde_choice_available.0.TimeSlod_day }}
+    {%endif %}
+
+    <h4>
+        {% if appointment_seconde_choice_available %}
+            {% for item in appointment_second_choice %}
+                {% if forloop.first and forloop.last %}
+                    Le {{ item.TimeSlot_day }}
+                        {% else %}
+                            Du
+                            {% if forloop.first %}
+                            {{ item.TimeSlot_day }}
+                            {% endif %}
+                            au
+                            {% if forloop.last %}
+                            {{ item.TimeSlot_day }}
+                        {% endif %}
+                {% endif %}
+            {% endfor %}
+            <br>
+                <button type="submit" name="timeslot_id" value="{{ item.id }}">Confirmer le rendez-vous</button>
+     {% else %}
+        <p>{{ error_message_second_choice }}</p>
+        {% endif %}
+
+    </h4>
+
+
+    <h2> All available slots</h2>
+    <br>
+    <p> Number of slots: {{ available_slots_count }}</p>
+    <br>
+
+
+    {% for item in appointment_second_choice %}
+    <h4>Timeslot ID: {{ item.TimeSlot_day }}</h4>
+    <p>id du slot {{ item.id }}</p>
+    <p>nombre de patient dispo pour ce slot {{ item.patient_available }}</p>
+    {% endfor %}
+
+    <!-- tests -->
+    <hr>

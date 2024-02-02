@@ -7,4 +7,5 @@ urlpatterns = [
     path('get-doctors/<int:service>/', views.GetDoctors.as_view(), name='doctors'),
     path('check-date_start/<str:date>/', views.GetDate_Start.as_view(), name='date_start'),
     path('check-slot/<int:doctor_id>&<date_start>&<date_stop>', views.GetSlot, name='getslot'),
+    path('get-more-slot/<int:doctor_id>&<date_start>&<int:duration>', views.GetMoreSlot, name='getmoreslot'),
 ]
