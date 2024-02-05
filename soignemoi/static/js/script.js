@@ -87,36 +87,53 @@ $(document).ready(function () {
       $.ajax({
         url: "/check-date_start/" + $this.val(),
         type: "GET",
-        success: function (response) {
+        success: function () {
           $("input[name='dateStart']").css("border-color", "green");
+          $("#dateStartErroMessage").attr("hidden", true);
         },
         error: function (response) {
+          var errorMessage = response.responseJSON.error;
           $("input[name='dateStart']").css("border-color", "red");
+          $("#dateStartErroMessage").removeAttr("hidden");
+          $("#dateStartErroMessage").html(errorMessage);
         },
       });
+    } else if ($this.val() != "" && $("form input[name='dateStop']").val() != "") {
+      var dateStop = new Date($("form input[name='dateStop']").val());
+      if (dateStop > dateStart) {
+        $("input[name='dateStart']").css("border-color", "red");
+        $("#dateStartErroMessage").removeAttr("hidden");
+        $("#dateStartErroMessage").html("La date de début ne peut être supérieur à la date de fin");
+      }
     }
   });
 
-  //check dateStop value
-  $("form input[name='dateStop']").on("change", function () {
-    var dateStop = new Date($(this).val());
+  $("form input[name='dateStop'], form input[name='dateStart']").on("change", function () {
+    var dateStop = new Date($("form input[name='dateStop']").val());
     var dateStart = new Date($("form input[name='dateStart']").val());
-
+    console.log(dateStop);
     if (dateStop >= dateStart) {
-      $("input[name='dateStop']").css("border-color", "green");
+        $("input[name='dateStop']").css("border-color", "green");
+        $("#dateEndErroMessage").attr("hidden", true);
 
-      // Calculate the difference in days
-      var diffTime = Math.abs(dateStop - dateStart);
-      var diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
-      diffDays = diffDays + 1;
+        // Calculate the difference in days
+        var diffTime = Math.abs(dateStop - dateStart);
+        var diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
+        diffDays = diffDays + 1;
 
-
-      // Display the difference in the <p name="dateDuration"></p> element
-      $("p[name='dateDuration']").text(diffDays + " jour(s)");
+        // Display the difference in the <p name="dateDuration"></p> element
+        $("p[name='dateDuration']").text(diffDays + " jour(s)");
+        $("input[name='durationDay']").removeAttr("hidden");
+    } else if (dateStart > dateStop) {
+      console.log("dateStart > dateStop");
+        $("input[name='dateStart']").css("border-color", "red");
+        $("#dateStartErroMessage").removeAttr("hidden");
     } else {
-      $("input[name='dateStop']").css("border-color", "red");
+        console.log("Enter Else");
+        $("input[name='dateStop']").css("border-color", "red");
+        $("#dateEndErroMessage").removeAttr("hidden");
     }
-  });
+});
 
   //enable submit button appoinment_submit
 

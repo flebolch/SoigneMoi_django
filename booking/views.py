@@ -45,9 +45,10 @@ class GetDate_Start(View):
     def get(self, request, date):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             date = datetime.strptime(date, "%Y-%m-%d").date()
-            if date <= (timezone.now().date() + timedelta(days=1)):
-                messages.error(request, "La date de début doit être supérieure à la date actuelle")
-                return JsonResponse({"error": "La date de début doit être supérieure à la date actuelle"}, status=400)
+            date_minimum = timezone.now().date() + timedelta(days=1)
+            if date <= date_minimum:
+                date_mimum_format = date_minimum.strftime("%d-%m-%Y")
+                return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
             else:
                 return JsonResponse({"success": "Date is valid"}, status=200)
         return HttpResponse("This is not an ajax request")
@@ -202,3 +203,6 @@ def find_consecutive_slots(available_slots, duration_days):
             return slot_range
 
     return None
+
+# def register_appointment(request, patient_id, doctor_id, intervention, date_start, date_stop):
+#     if request.method == 'POST':
