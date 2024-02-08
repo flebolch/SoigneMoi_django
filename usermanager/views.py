@@ -3,6 +3,7 @@ from .forms.registerationforms import RegistrationForm, PatientProfileForm
 from .models import Account, PatientProfile
 from django.contrib import messages, auth
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def register (request):
@@ -18,17 +19,16 @@ def register (request):
            print(user)
            user.save()
            PatientProfile.objects.create(user=user)
+           messages.success(request, 'Votre compte a été créé avec succès')
            return redirect('connection')
        else:
-            print(f"Form errors: {form.errors}")
-            print(f"Form errors: {form.non_field_errors}")
+            for filed, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error, extra_tags='danger')
+            return render(request, 'usermanager/register.html', {'form': form})
     else:
-        print("problème de formulaire")
         form = RegistrationForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'usermanager/register.html', context)
+    return render(request, 'usermanager/register.html', {'form': form})
 
 def login (request):
     if request.method == 'POST':
@@ -38,48 +38,39 @@ def login (request):
         
         if user is not None:
             if user.is_active:
-                print("Utilisateur actif")
-            print("Authentification réussie")
-            auth.login(request, user)
-            if hasattr(user, 'patientprofile'):  # Check if the user has a PatientProfile
-                if user.patientprofile.address_line_1 == '':  # Check if address_line_1 is empty
-                    return edit_profile(request)
+                auth.login(request, user)
+                # case : User is a patient and has a completed profile
+                if hasattr(user, 'patientprofile'):  # Check if the user has a PatientProfile
+                    if user.patientprofile.address_line_1 != '':  # Check if address_line_1 is empty
+                        return redirect('mon_espace_visiteur')
+                    # case : User is visitor but has no profile
+                    else:
+                        return redirect('nouveau_visiteur')
                 else:
-                    return visitordashboard(request)
-            else:
-                print("User does not have a PatientProfile")
-                return redirect('visitordashboard')
+                    messages.error(request, 'Votre compte n\'a pas de profile visiteur. Veuillez contacter l\'administrateur', extra_tags='danger')
+                    auth.logout(request)
+                    return redirect('connection')
         else:
             print("Problème d'authentification")
     else:
         print("Problème de méthode")
     return render(request, 'usermanager/login.html')
 
-def edit_profile(request):
-    # userprofile = get_object_or_404(UserProfile, user=request.user)
-    # if request.method == 'POST':
-    #     user_form = UserForm(request.POST, instance=request.user)
-    #     profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-    #     if user_form.is_valid() and profile_form.is_valid():
-    #         user_form.save()
-    #         profile_form.save()
-    #         messages.success(request, 'Your profile has been updated.')
-    #         return redirect('edit_profile')
-    # else:
-    #     user_form = UserForm(instance=request.user)
-    #     profile_form = UserProfileForm(instance=userprofile)
-    # context = {
-    #     'user_form': user_form,
-    #     'profile_form': profile_form,
-    #     'userprofile': userprofile,
-    # }
-    return render(request, 'usermanager/patient_info.html')
+@login_required
+def register_visitor(request):
+    return render(request, 'usermanager/nouveau_visiteur.html')
 
-
+@login_required
 def visitordashboard (request):
-    return render(request, 'usermanager/mon_espace_visiteur.html')
+    visitorprofile = get_object_or_404(PatientProfile, user=request.user)
+    context = {
+        'visitorprofile': visitorprofile
+    }
+    return render(request, 'usermanager/mon_espace_visiteur.html', context)
 
-
+@login_required
 def logout (request):
-    return
+    auth.logout(request)
+    messages.success(request, 'Vous êtes déconnecté')
+    return redirect('connection')
 

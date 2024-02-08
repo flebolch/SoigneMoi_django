@@ -26,6 +26,10 @@ class RegistrationForm(forms.ModelForm):
         password = cleaned_data.get('password')
         confirm_password = cleaned_data.get('confirm_password')
 
+        if Account.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                "L'adresse email existe déjà"
+            )
 
         if password != confirm_password:
             raise forms.ValidationError(
