@@ -80,75 +80,98 @@ $(document).ready(function () {
     }
   );
 
-  //check dateStart value
-  $("form input[name='dateStart']").on("change", function () {
-    var $this = $(this);
-    if ($this.val() != "") {
-      $.ajax({
-        url: "/check-date_start/" + $this.val(),
-        type: "GET",
-        success: function () {
-          $("input[name='dateStart']").css("border-color", "green");
-          $("#dateStartErroMessage").attr("hidden", true);
-        },
-        error: function (response) {
-          var errorMessage = response.responseJSON.error;
-          $("input[name='dateStart']").css("border-color", "red");
-          $("#dateStartErroMessage").removeAttr("hidden");
-          $("#dateStartErroMessage").html(errorMessage);
-        },
-      });
-    } else if ($this.val() != "" && $("form input[name='dateStop']").val() != "") {
-      var dateStop = new Date($("form input[name='dateStop']").val());
-      if (dateStop > dateStart) {
-        $("input[name='dateStart']").css("border-color", "red");
-        $("#dateStartErroMessage").removeAttr("hidden");
-        $("#dateStartErroMessage").html("La date de début ne peut être supérieur à la date de fin");
-      }
-    }
-  });
+// Define the selectors for easier reuse and better performance
+var $dateStart = $("form input[name='dateStart']");
+var $dateStop = $("form input[name='dateStop']");
+var $submitBtn = $("input[name='appoinment_submit']");
 
-  $("form input[name='dateStop'], form input[name='dateStart']").on("change", function () {
-    var dateStop = new Date($("form input[name='dateStop']").val());
-    var dateStart = new Date($("form input[name='dateStart']").val());
-    console.log(dateStop);
-    if (dateStop >= dateStart) {
-        $("input[name='dateStop']").css("border-color", "green");
-        $("#dateEndErroMessage").attr("hidden", true);
-
-        // Calculate the difference in days
-        var diffTime = Math.abs(dateStop - dateStart);
-        var diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); 
-        diffDays = diffDays + 1;
-
-        // Display the difference in the <p name="dateDuration"></p> element
-        $("p[name='dateDuration']").text(diffDays + " jour(s)");
-        $("input[name='durationDay']").removeAttr("hidden");
-    } else if (dateStart > dateStop) {
-      console.log("dateStart > dateStop");
-        $("input[name='dateStart']").css("border-color", "red");
-        $("#dateStartErroMessage").removeAttr("hidden");
+// Define a function to update the border color and error message
+function updateInput(input, color, message) {
+    input.css("border-color", color);
+    var $errorMessage = $("#" + input.attr("name") + "ErroMessage");
+    if (message) {
+        $errorMessage.html(message).removeAttr("hidden");
     } else {
-        console.log("Enter Else");
-        $("input[name='dateStop']").css("border-color", "red");
-        $("#dateEndErroMessage").removeAttr("hidden");
+        $errorMessage.attr("hidden", true);
+    }
+}
+
+// Check dateStart value
+$dateStart.on("change", function () {
+    var dateStartVal = $(this).val();
+    if (dateStartVal) {
+        $.ajax({
+            url: "/check-date_start/" + dateStartVal,
+            type: "GET",
+            success: function () {
+                updateInput($dateStart, "green");
+            },
+            error: function (response) {
+                updateInput($dateStart, "red", response.responseJSON.error);
+            },
+        });
     }
 });
 
-  //enable submit button appoinment_submit
-
-  $("form input[name='dateStart'], form input[name='dateStop']").on(
-    "change",
-    function () {
-      var $selectedDateStart = $("form input[name='dateStart']").val();
-      var $selectedDateStop = $("form input[name='dateStop']").val();
-      if ($selectedDateStart != "" && $selectedDateStop != "") {
-        $("input[name='appoinment_submit']").removeAttr("disabled");
-      } else {
-        $("input[name='appoinment_submit']").attr("disabled", "disabled");
-      }
+// Check dateStop and dateStart values
+$dateStop.add($dateStart).on("change", function () {
+    var dateStopVal = new Date($dateStop.val());
+    var dateStartVal = new Date($dateStart.val());
+    if (dateStopVal >= dateStartVal) {
+        updateInput($dateStop, "green");
+        var diffDays = Math.round(Math.abs(dateStopVal - dateStartVal) / (1000 * 60 * 60 * 24)) + 1;
+        $("p[name='dateDuration']").text(diffDays + " jour(s)");
+        $("input[name='durationDay']").removeAttr("hidden");
+    } else {
+        updateInput($dateStart, "red", "La date de début ne peut être supérieur à la date de fin");
     }
-  );
+});
+
+// Enable submit button
+$dateStop.add($dateStart).on("change", function () {
+    if ($dateStart.val() && $dateStop.val()) {
+        $submitBtn.removeAttr("disabled");
+    } else {
+        $submitBtn.attr("disabled", "disabled");
+    }
+});
+
+
+
+  document.querySelector('[name="appoinment_submit"]').addEventListener('click', function(event) {
+    event.preventDefault();
+
+    var doctor = document.querySelector('[name="doctor"]').value;
+    var dateStart = document.querySelector('[name="dateStart"]').value;
+    var dateStop = document.querySelector('[name="dateStop"]').value;
+
+    if (doctor && dateStart && dateStop) {
+        fetch('/check-slot/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+            },
+            body: new URLSearchParams({
+                'doctor_id': doctor,
+                'date_start': dateStart,
+                'date_stop': dateStop
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (response.ok) {
+                // Handle success
+                console.log(data);
+            } else {
+                // Handle error
+                console.error(data);
+            }
+        });
+    } else {
+        alert('Please fill in all fields');
+    }
+});
 
   //end of document ready
 });

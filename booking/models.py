@@ -70,22 +70,21 @@ class Appointment_temp(models.Model):
     
 # booking final model 
 class TimeSlot(models.Model):
-    @staticmethod
     def get_default_start_time():
-        return timezone.now().replace(hour=0, minute=0, second=0)
+        # Fixed time: 00:00:00
+        return timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    
     slot_start = models.DateTimeField(default=get_default_start_time, blank=False, null=False)
     slot_end = models.DateTimeField(blank=True, null=True)
     doctor = models.ForeignKey(DoctorProfile_temp, on_delete=models.CASCADE)
     is_available = models.BooleanField(default=True)
-    patient_available = models.IntegerField(default=5, validators=[MinValueValidator(0)])
+    patient_available = models.IntegerField(default=5)
     date_added = models.DateTimeField(auto_now_add=True)
-    
 
     def save(self, *args, **kwargs):
-        if self.slot_end is None:
-            self.slot_end = self.slot_start + timedelta(hours=22, minutes=59)
+        # Set slot_end to the end of the day
+        if not self.slot_end:
+            self.slot_end = self.slot_start.replace(hour=23, minute=59, second=59)
         super().save(*args, **kwargs)
     
     def TimeSlot_day(self):
@@ -96,4 +95,4 @@ class TimeSlot(models.Model):
         verbose_name_plural = 'time_slots'
 
     def __str__(self):
-        return str(self.id)
+        return f"TimeSlot {self.slot_start} - {self.slot_end}"

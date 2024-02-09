@@ -35,6 +35,7 @@
       <div class="col-md-12">
         <div class="card">
           <form action="TypeRendez-vous" class="form-outline mb-4 ">
+            {% csrf_token %}
             <div class="card-header">
               <h3>Bonjour {{ patient }}, remplissez le formulaire suivant pour créer un nouveau séjour :</h3>
             </div>
@@ -98,8 +99,9 @@
               </div>
 
               <div class="row my-4 justify-content-center">
-                <input type="submit" value="Confirmer la demande de rendez-vous"
-                  class="btn btn-warning btn-lg btn-block w-auto text-center" disabled="True" name="appoinment_submit">
+                <button class="btn btn-warning btn-lg btn-block w-auto text-center" disabled="True" id="appoinment_submit">
+                    Trouver un rendez-vous
+                </button>
               </div>
 
             </div>
