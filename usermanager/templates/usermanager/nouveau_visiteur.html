@@ -15,6 +15,7 @@
 
 
     <a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Déconnection</span> </a>
+
   </section>
 
   <section class="section-content padding-y">
@@ -25,13 +26,16 @@
           <h3 class="card-title">Complétez vos informations :</h3>
         </header>
         <p class="pt-4 mb-4 pb-2">
-         Bonjou {{ user.full_name }}, pour continuer, veuillez remplir les informations suivantes :
+          <p>
+           Bonjour {{ user.full_name }},
+         </p>
+        </p>
+          pour continuer, veuillez remplir les informations suivantes :
         </p>
         {% include 'includes/alerts.html' %}
 
         <form action="{% url 'nouveau_visiteur' %}" method="POST">
           {% csrf_token %}
-          class="form-control form-control-lg py-2 gap-4 text-start">
 
 
           <div class="form-group">

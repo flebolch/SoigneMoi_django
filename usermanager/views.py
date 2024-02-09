@@ -91,6 +91,14 @@ def visitordashboard (request):
     return render(request, 'usermanager/mon_espace_visiteur.html', context)
 
 @login_required
+def profile(request):
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    context = {
+        'patient_profile': patient_profile,
+    }
+    return render(request, 'usermanager/mon_profil.html', context)
+
+@login_required
 def logout (request):
     auth.logout(request)
     messages.success(request, 'Vous êtes déconnecté')

@@ -1,0 +1,10 @@
+<aside class="col-md-3">
+    <!--   SIDEBAR   -->
+    <ul class="list-group">
+      <a class="list-group-item {% if '/mon_espace_visiteur/' == request.path %}active{% endif %}" href="{% url 'mon_espace_visiteur' %}"> Mon espace </a>
+      <a class="list-group-item {% if '/mon_profil/' == request.path %}active{% endif %}" href="{% url 'mon_profil' %}"> Compléter mon profil </a>
+    </ul>
+    <br>
+    <a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Log out</span> </a>
+    <!--   SIDEBAR .//END   -->
+  </aside>
