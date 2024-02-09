@@ -18,7 +18,7 @@ def booking(request, patient_id):
     return render(request, 'booking/booking.html', context)
 
 
-class GetInterventions(View):
+class getInterventions(View):
     def get(self, request, service, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             service = Service_temp.objects.get(id=service)
@@ -28,7 +28,7 @@ class GetInterventions(View):
             return JsonResponse(data_service)
         return HttpResponse("This is not an ajax request")
     
-class GetDoctors(View):
+class getDoctors(View):
     def get(self, request, service, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             service = Service_temp.objects.get(id=service)
@@ -38,30 +38,49 @@ class GetDoctors(View):
             return JsonResponse(data_doctors)
         return HttpResponse("This is not an ajax request")
     
-class GetDate_Start(View):
-    def get(self, request, date):
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-            date_minimum = timezone.now().date() + timedelta(days=1)
-            if date <= date_minimum:
-                date_mimum_format = date_minimum.strftime("%d-%m-%Y")
-                return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
-            else:
-                return JsonResponse({"success": "Date is valid"}, status=200)
-        return HttpResponse("This is not an ajax request")
+def date(request):
+    return render(request, 'booking/check-date.html')
     
-class GetDate_Stop(View):
-    def get(self, request, date):
+class checkDates(View):
+    def get(self, request, date_start, date_stop):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-            date_minimum = timezone.now().date() + timedelta(days=1)
-            if date <= date_minimum:
-                date_mimum_format = date_minimum.strftime("%d-%m-%Y")
-                return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
+            date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
+            date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
+            # chekink if date is greater than today
+            if date_start < timezone.now().date():
+                return JsonResponse({"errorDateStart": "Merci de choisir une date future."}, status=400)
+            elif date_start > date_stop:
+                return JsonResponse({"errorDateStop": "La date de début ne peut pas être après la date de fin."}, status=400)
             else:
-                return JsonResponse({"success": "Date is valid"}, status=200)
+                return JsonResponse({"success": "Vous avez choisi un rendez-vous du"}, status=200)
         return HttpResponse("This is not an ajax request")
+
+
+# class GetDate_Start(View):
+#     def get(self, request, date):
+#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+#             date = datetime.strptime(date, "%Y-%m-%d").date()
+#             date_minimum = timezone.now().date() + timedelta(days=1)
+#             if date <= date_minimum:
+#                 date_mimum_format = date_minimum.strftime("%d-%m-%Y")
+#                 return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
+#             else:
+#                 return JsonResponse({"success": "Date is valid"}, status=200)
+#         return HttpResponse("This is not an ajax request")
     
+# class GetDate_Stop(View):
+#     def get(self, request, date):
+#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+#             date = datetime.strptime(date, "%Y-%m-%d").date()
+#             date_minimum = timezone.now().date() + timedelta(days=1)
+#             if date <= date_minimum:
+#                 date_mimum_format = date_minimum.strftime("%d-%m-%Y")
+#                 return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
+#             else:
+#                 return JsonResponse({"success": "Date is valid"}, status=200)
+#         return HttpResponse("This is not an ajax request")
+    
+
 # class checkDate(View):
 #     def get(self, request, date_start, date_stop):
 #         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
