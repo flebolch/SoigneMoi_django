@@ -51,18 +51,40 @@ def login (request):
                     auth.logout(request)
                     return redirect('connection')
         else:
-            print("Problème d'authentification")
+            messages.error(request, 'Problème d\'authentification', extra_tags='danger')
     else:
-        print("Problème de méthode")
+        messages.error(request, 'Problème de méthode', extra_tags='danger')
     return render(request, 'usermanager/login.html')
 
 @login_required
 def register_visitor(request):
+    visitorprofile = get_object_or_404(PatientProfile, user=request.user)
+    visitorform = PatientProfileForm(request.POST or None, instance=visitorprofile)
+    if request.method == 'POST':
+        if visitorform.is_valid():
+            address_line_1 = visitorform.cleaned_data['address_line_1']
+            address_line_2 = visitorform.cleaned_data['address_line_2']
+            city = visitorform.cleaned_data['city']
+            zipcode = visitorform.cleaned_data['zipcode']
+            country = visitorform.cleaned_data['country']
+            visitorprofile.save()
+            messages.success(request, 'Votre profile a été mis à jour')
+            return redirect('mon_espace_visiteur')
+        else:
+            for error in visitorform.errors.values():
+                for error_message in error:
+                    messages.error(request, error_message, extra_tags='danger')
+            return render(request, 'usermanager/nouveau_visiteur.html', {'visitorform': visitorform})
     return render(request, 'usermanager/nouveau_visiteur.html')
 
 @login_required
 def visitordashboard (request):
     visitorprofile = get_object_or_404(PatientProfile, user=request.user)
+    if visitorprofile.address_line_1 != '':
+        pass
+    else:
+        messages.info(request, 'Veuillez compléter votre profile')
+        return redirect('nouveau_visiteur')
     context = {
         'visitorprofile': visitorprofile
     }

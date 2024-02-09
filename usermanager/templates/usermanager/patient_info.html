@@ -12,10 +12,12 @@
 
 
 <body>
+  <section class="section-content padding-y">
+  {% include 'includes/alerts.html' %}
     <p> Mes infos sont déja renseignées</p>
 
     <a class="btn btn-light btn-block" href="{% url 'logout' %}"> <i class="fa fa-power-off"></i> <span class="text">Déconnection</span> </a>
-
+  </section>
 
 </body>
 </html>

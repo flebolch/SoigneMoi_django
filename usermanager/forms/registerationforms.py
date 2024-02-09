@@ -46,8 +46,9 @@ class RegistrationForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = 'form-control'
 
 class PatientProfileForm(forms.ModelForm):
-    model  = PatientProfile
-    fields = ('address_line_1', 'address_line_2', 'city', 'zipcode', 'country')
+    class Meta:
+        model  = PatientProfile
+        fields = ('address_line_1', 'address_line_2', 'city', 'zipcode', 'country')
 
     def __init__(self, *args, **kwargs):
         super(PatientProfileForm, self).__init__(*args, **kwargs)
