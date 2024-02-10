@@ -44,16 +44,48 @@ def date(request):
 class checkDates(View):
     def get(self, request, date_start, date_stop):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Only for testing purpose, in production, the patient_id will be passed as a parameter
+
+            
             date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
             date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
+            patient_id = 1
+
+            result = isPatientAvailable(patient_id, date_start, date_stop)
+            print('result:',result)
+            
+            
             # chekink if date is greater than today
             if date_start < timezone.now().date():
                 return JsonResponse({"errorDateStart": "Merci de choisir une date future."}, status=400)
             elif date_start > date_stop:
                 return JsonResponse({"errorDateStop": "La date de début ne peut pas être après la date de fin."}, status=400)
-            else:
-                return JsonResponse({"success": "Vous avez choisi un rendez-vous du"}, status=200)
+            elif isPatientAvailable(patient_id, date_start, date_stop) == False:
+                return JsonResponse({"errorDateStart": "Vous avez déjà un rendez-vous prévu sur cette plage de rendez-vous."}, status=400)
+            else: 
+                return JsonResponse({"success": "Date is valid"}, status=200)
         return HttpResponse("This is not an ajax request")
+
+def isPatientAvailable(patient_id, date_start, date_stop):
+    patient = get_object_or_404(PatientProfile_temp, pk=patient_id)
+    all_appointments = Appointment_temp.objects.filter(patient=patient_id)
+    patient_available = False
+
+    # Convert date_start and date_stop to datetime objects
+    date_start = timezone.make_aware(datetime.combine(date_start, time.min))
+    date_stop = timezone.make_aware(datetime.combine(date_stop, time.max))
+
+    for appointment in all_appointments:
+        appointment_start_date = appointment.date_start.date()
+        appointment_stop_date = appointment.date_stop.date()
+        if date_start >= appointment.date_start and date_start <= appointment.date_stop:
+            patient_available = False
+        elif date_stop >= appointment.date_start and date_stop <= appointment.date_stop:
+            patient_available = False
+        else:
+            patient_available = True
+    return patient_available
+    
 
 
 # class GetDate_Start(View):

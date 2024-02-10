@@ -45,13 +45,20 @@ class PatientProfile_temp(models.Model):
         return self.patientFullName
 
 class Appointment_temp(models.Model):
+    def get_default_start_time():
+        return timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    def get_default_end_time():
+        return timezone.now().replace(hour=23, minute=59, second=59, microsecond=0)
+    
     appointment_id = models.AutoField(primary_key=True)
     patient = models.ForeignKey(PatientProfile_temp, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorProfile_temp, on_delete=models.CASCADE)
     intervention = models.ForeignKey(Intervention_temp, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
-    date_start = models.DateTimeField()
-    date_stop = models.DateTimeField()
+    date_start = models.DateTimeField(default=get_default_start_time, blank=False, null=False)
+    date_stop = models.DateTimeField(default=get_default_end_time, blank=False, null=False)
+
 
     def duration(self):
         return self.date_stop - self.date_start
@@ -71,7 +78,6 @@ class Appointment_temp(models.Model):
 # booking final model 
 class TimeSlot(models.Model):
     def get_default_start_time():
-        # Fixed time: 00:00:00
         return timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     slot_start = models.DateTimeField(default=get_default_start_time, blank=False, null=False)
