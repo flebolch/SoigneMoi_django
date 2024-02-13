@@ -19,7 +19,6 @@ class Service_temp(models.Model):
     
 class Intervention_temp(models.Model):
     name = models.CharField(max_length=100)
-    duration = models.PositiveSmallIntegerField() 
     service = models.ForeignKey(Service_temp, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:

@@ -22,7 +22,7 @@
 <body>
   <script src="{% static 'js/script.js' %}"></script>
 
-
+  {% load i18n %}
   {% block content %}
 
   <!-- take an appoinment start -->
@@ -34,36 +34,42 @@
     <div class="row">
       <div class="col-md-12">
         <div class="card">
-          <form action="TypeRendez-vous" class="form-outline mb-4 ">
+          <form action="{% url 'prendre-rendez-vous' %}" method="POST" class="form-outline mb-4 ">
             {% csrf_token %}
             <div class="card-header">
               <h3>Bonjour {{ patient }}, remplissez le formulaire suivant pour créer un nouveau séjour :</h3>
             </div>
+            <div name="selectService">
 
-            <div class="form-group validate my-2 mx-2">
-              <p>Sélectionnez le service dans lequelle vous souhaitez séjourner :</p>
-
-              <select class="form-select" aria-label="Select Service" name="service">
-                <option value="">Choisir un service</option>
-                {% for service in services %}
-                <option value="{{ service.id }}">{{ service.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div name="intervention_medecin" hidden>
-
-              <div class=" form-group validate my-2 mx-2">
-                <p>Sélectionnez le type de soin :</p>
-                <select class="form-select" aria-label="Select Service" name="intervention" disabled="True">
-                  <option value="">Choisir une intervention</option>
-                  {% for intervention in interventions %}
-                  <option value="{{ intervention.id }}">{{ intervention.name }} - {{ intervention.duration }} jours
-                  </option>
+              <div class="form-group validate my-2 mx-2">
+                <p>Sélectionnez le service dans lequelle vous souhaitez séjourner :</p>
+                
+                <select class="form-select" aria-label="Select Service" name="service">
+                  <option value="">Choisir un service</option>
+                  {% for service in services %}
+                  <option value="{{ service.id }}">{{ service.name }}</option>
                   {% endfor %}
                 </select>
+                <p class="text-danger" id="selectServiceErrorMessage" name="selectServiceErrorMessage" hidden></p>
               </div>
+            </div>
+              
+            <div name="selectInterventionAndDoctor">
 
+              <div class="d-flex flex-column flex-lg-row justify-content-evenly">
+                
+                <div class=" form-group validate my-2 mx-2">
+                  <p>Sélectionnez le type de soin :</p>
+                  <select class="form-select" aria-label="Select Service" name="intervention" disabled="True">
+                    <option value="">Choisir une intervention</option>
+                    {% for intervention in interventions %}
+                    <option value="{{ intervention.id }}">{{ intervention.name }} 
+                    </option>
+                  {% endfor %}
+                </select>
+                <p class="text-danger" id="selectInterventionErrorMessage" name="selectInterventionErrorMessage" hidden></p>
+              </div>
+              
               <div class=" form-group validate my-2 mx-2">
                 <p>Sélectionnez le médecin :</p>
                 <select class="form-select" aria-label="Select Service" name="doctor" disabled="True">
@@ -73,13 +79,15 @@
                   </option>
                   {% endfor %}
                 </select>
+                <p class="text-danger" id="selectDoctorErrorMessage" name="selectDoctorErrorMessage" hidden></p>
               </div>
+              
             </div>
+          </div>
+            
+            <div name='dates_validation'>
 
-            <div name='dates_validation' hidden>
-
-
-              <div class="d-flex flex-column flex-lg-row justify-content-around">
+              <div class="d-flex flex-column flex-lg-row justify-content-evenly">
                 <div class="form-group my-2 mx-2">
                   <p>Date de début de séjour :</p>
                   <input type="date" class="form-control" name="dateStart" placeholder="Date de début de séjour">
@@ -89,15 +97,20 @@
                 <div class="form-group my-2 mx-2">
                   <p>Date de fin de séjour :</p>
                   <input type="date" class="form-control" name="dateStop" placeholder="Date de début de séjour">
-                  <p class="text-danger" id="dateStopErroMessage" name="dateStopErroMessage" hidden>La date de fin de séjour ne peut pas précéder celle de début.</p>
+                  <p class="text-danger" id="dateStopErroMessage" name="dateStopErroMessage" hidden></p>
                 </div>
         
               </div>
                 <div class="d-flex justify-content-center my-2 py-2">
-                    <button type="submit" class="btn btn-primary" name="submitDateStopAndStart">Vérifier les disponibilités</button>
+                    <button type="button" class="btn btn-primary" name="submitDateStopAndStart">Vérifier les disponibilités</button>
+                </div>
+                
+                <div class="appointementChoice" name="appointementChoice">
+                
                 </div>
 
             </div>
+            
 
 
           </form>

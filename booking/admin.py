@@ -11,9 +11,21 @@ class timeslotAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 class serviceAdmin(admin.ModelAdmin):
-    list_display = ('service_name', 'service_description')
-    list_filter = ['service_name', 'service_description']
-    readonly_fields=('id',)
+    list_display = ('id', 'name')
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+
+class InterventionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'service')
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+
+class DoctorProfileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'doctorFullName', 'service', 'speciality')
 
     filter_horizontal = ()
     list_filter = ()
@@ -27,9 +39,9 @@ class Appointment_tempAdmin(admin.ModelAdmin):
     list_filter = ()
     fieldsets = ()
 
-admin.site.register(Service_temp)
-admin.site.register(Intervention_temp)
-admin.site.register(DoctorProfile_temp)
+admin.site.register(Service_temp, serviceAdmin)
+admin.site.register(Intervention_temp, InterventionAdmin)
+admin.site.register(DoctorProfile_temp, DoctorProfileAdmin)
 admin.site.register(PatientProfile_temp)
 admin.site.register(Appointment_temp, Appointment_tempAdmin)
 admin.site.register(TimeSlot, timeslotAdmin)

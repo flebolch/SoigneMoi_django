@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from .models import *
 from django.views import View
@@ -7,8 +7,10 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 
 # Create your views here.
-def booking(request, patient_id):
-    patient  = get_object_or_404(PatientProfile_temp, pk=patient_id)
+def booking(request):
+    # patient  = get_object_or_404(PatientProfile_temp, pk=patient_id)
+    # Test value for patient_id
+    patient = get_object_or_404(PatientProfile_temp, pk=1)
     services = Service_temp.objects.all()
 
     context = {
@@ -18,42 +20,48 @@ def booking(request, patient_id):
     return render(request, 'booking/booking.html', context)
 
 
+def mybooking(request):
+    context = request.session.get('context')
+    print('From mybooking fonction :', context)
+    patient = get_object_or_404(PatientProfile_temp, pk=1)
+    return render(request, 'booking/mybooking.html', context)
+
+
 class getInterventions(View):
     def get(self, request, service, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             service = Service_temp.objects.get(id=service)
             interventions = Intervention_temp.objects.filter(service=service).order_by('name')
-            data_service = {'interventions': list(interventions.values('id', 'name', 'duration'))}
-            print(data_service)
+            data_service = {'interventions': list(interventions.values('id', 'name'))}
             return JsonResponse(data_service)
         return HttpResponse("This is not an ajax request")
-    
+
+
 class getDoctors(View):
     def get(self, request, service, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             service = Service_temp.objects.get(id=service)
             doctors = DoctorProfile_temp.objects.filter(service=service).order_by('doctorFullName')
             data_doctors = {'doctors': list(doctors.values('id', 'doctorFullName', 'speciality'))}
-            print(data_doctors)
             return JsonResponse(data_doctors)
         return HttpResponse("This is not an ajax request")
     
 def date(request):
     return render(request, 'booking/check-date.html')
+
+
     
 class checkDates(View):
-    def get(self, request, date_start, date_stop):
+    def get(self, request, date_start, date_stop, service, intervention, doctor):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # Only for testing purpose, in production, the patient_id will be passed as a parameter
 
             
             date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
             date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
-            patient_id = 1
-
-            result = isPatientAvailable(patient_id, date_start, date_stop)
-            print('result:',result)
-            
+            print('From checkDates fonction : service:', service,' intervention:', intervention, 'doctor:', doctor, 'date_start:', date_start, 'date_stop:', date_stop)
+            # Test value for patient_id
+            patient_id = get_object_or_404(PatientProfile_temp, pk=1)
             
             # chekink if date is greater than today
             if date_start < timezone.now().date():
@@ -63,11 +71,22 @@ class checkDates(View):
             elif isPatientAvailable(patient_id, date_start, date_stop) == False:
                 return JsonResponse({"errorDateStart": "Vous avez déjà un rendez-vous prévu sur cette plage de rendez-vous."}, status=400)
             else: 
-                return JsonResponse({"success": "Date is valid"}, status=200)
+                request.session['context'] = {
+                'patient_id': str(patient_id),
+                'date_start': str(date_start),
+                'date_stop': str(date_stop),
+                'service': service,
+                'intervention': intervention,
+                'doctor': doctor,
+                }
+            return JsonResponse({'success': True})
+        
         return HttpResponse("This is not an ajax request")
 
 def isPatientAvailable(patient_id, date_start, date_stop):
-    patient = get_object_or_404(PatientProfile_temp, pk=patient_id)
+
+    # patient = get_object_or_404(PatientProfile_temp, pk=patient_id)
+    
     all_appointments = Appointment_temp.objects.filter(patient=patient_id)
     patient_available = False
 
@@ -85,206 +104,97 @@ def isPatientAvailable(patient_id, date_start, date_stop):
         else:
             patient_available = True
     return patient_available
-    
 
 
-# class GetDate_Start(View):
-#     def get(self, request, date):
-#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#             date = datetime.strptime(date, "%Y-%m-%d").date()
-#             date_minimum = timezone.now().date() + timedelta(days=1)
-#             if date <= date_minimum:
-#                 date_mimum_format = date_minimum.strftime("%d-%m-%Y")
-#                 return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
-#             else:
-#                 return JsonResponse({"success": "Date is valid"}, status=200)
-#         return HttpResponse("This is not an ajax request")
-    
-# class GetDate_Stop(View):
-#     def get(self, request, date):
-#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#             date = datetime.strptime(date, "%Y-%m-%d").date()
-#             date_minimum = timezone.now().date() + timedelta(days=1)
-#             if date <= date_minimum:
-#                 date_mimum_format = date_minimum.strftime("%d-%m-%Y")
-#                 return JsonResponse({"error": f"Merci de choisir une date après le {date_mimum_format}"}, status=400)
-#             else:
-#                 return JsonResponse({"success": "Date is valid"}, status=200)
-#         return HttpResponse("This is not an ajax request")
+
+def getDuration(request, date_start, date_stop):
+    duration_days = (date_stop - date_start).days + 1
+    print('get duration fct duration_days : ', duration_days)
+    return duration_days
     
 
-# class checkDate(View):
-#     def get(self, request, date_start, date_stop):
-#         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-#             date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
-#             date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
-#             if date_start > date_stop:
-#                 return JsonResponse({"error": "La date de début ne peut pas être après la date de fin."}, status=400)
-#             else:
-#                 return JsonResponse({"success": "Date is valid"}, status=200)
-#         return HttpResponse("This is not an ajax request")
-    
 
 # Getslot Raw method
 
-# def GetSlot(request, doctor_id, date_start, date_stop):
-#     try:
-#         doctor = DoctorProfile_temp.objects.get(id=doctor_id)
-#         date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
-#         date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
+def GetSlot(request, doctor_id, date_start, date_stop):
+    try:
+        doctor = DoctorProfile_temp.objects.get(id=doctor_id)
+        date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
+        date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
 
-#         if date_start > date_stop:
-#             return HttpResponseBadRequest("Invalid date range: date_start cannot be after date_stop")
+        if date_start > date_stop:
+            return HttpResponseBadRequest("Invalid date range: date_start cannot be after date_stop")
 
-#     except DoctorProfile_temp.DoesNotExist:
-#         return HttpResponseBadRequest("Invalid doctor_id")
+    except DoctorProfile_temp.DoesNotExist:
+        return HttpResponseBadRequest("Invalid doctor_id")
 
-#     except ValueError:
-#         return HttpResponseBadRequest("Invalid date format")
+    except ValueError:
+        return HttpResponseBadRequest("Invalid date format")
 
-#     # Calculate the number of days required
-#     duration_days = (date_stop - date_start).days + 1
+    # Calculate the number of days required
+    # duration_days = (date_stop - date_start).days + 1
+    duration_days = getDuration(request, date_start, date_stop)
+    print('duration_days from getslot: ', duration_days)
 
-#     # Get the number of available slots after date_start
-#     available_slots = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start)
-#     available_slots_count = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start).count()
+    # Get the number of available slots after date_start
+    available_slots = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start)
+    available_slots_count = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start).count()
 
-#     # Create a list of all dates from date_start to date_stop
-#     date_range = [date_start + timedelta(days=i) for i in range((date_stop - date_start).days + 1)]
+    # Create a list of all dates from date_start to date_stop
+    date_range = [date_start + timedelta(days=i) for i in range((date_stop - date_start).days + 1)]
 
-#     # Check if there is a TimeSlot for each date
-#     timeslots_start = []
-#     for date in date_range:
-#         timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=date)
-#         if timeslot.exists():
-#             timeslots_start.append(timeslot.first())
+    # Check if there is a TimeSlot for each date
+    timeslots_start = []
+    for date in date_range:
+        timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=date)
+        if timeslot.exists():
+            timeslots_start.append(timeslot.first())
 
-#     error_message = ""
-#     if len(timeslots_start) < len(date_range):
-#         error_message = "Not enough available dates for the required number of days."
+    error_message = ""
+    if len(timeslots_start) < len(date_range):
+        error_message = "Not enough available dates for the required number of days."
     
-#         # Create a range of all timeslots or placeholders from date_start to date_stop
-#     appointment_requested = []
-#     appointment_requested_available = False
-#     current_date = date_start
-#     error_message_first_choice = ""
-#     success_message_first_choice = ""
-#     while current_date <= date_stop:
-#         timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=current_date)
-#         if timeslot.exists():
-#             appointment_requested.append(timeslot.first())
-#         else:
-#             break
-#         current_date += timedelta(days=1)
+        # Create a range of all timeslots or placeholders from date_start to date_stop
+    appointment_requested = []
+    appointment_requested_available = False
+    current_date = date_start
+    error_message_first_choice = ""
+    success_message_first_choice = ""
+    while current_date <= date_stop:
+        timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=current_date)
+        if timeslot.exists():
+            appointment_requested_available.append(timeslot.first())
+        else:
+            break
+        current_date += timedelta(days=1)
 
        
-#     if len(appointment_requested) == duration_days:
-#         success_message_first_choice = "dates are available"
-#         appointment_requested_available = True
-#     else:
-#         appointment_requested = []
-#         error_message_first_choice = "Il n'y a pas de créneaux disponnibles à cette date pour le moment."
-
-#     context = {
-#         'doctor': doctor,
-#         'date_start': date_start,
-#         'date_stop': date_stop,
-#         'duration_days': duration_days,
-#         'timeslots_start': timeslots_start,
-#         'error_message': error_message,
-#         'success_message_first_choice': success_message_first_choice,
-#         'available_slots': available_slots,
-#         'available_slots_count': available_slots_count,
-#         'error_message_first_choice': error_message_first_choice,
-#         'appointment_requested': appointment_requested,
-#         'appointment_requested_available': appointment_requested_available,
-#     }
-
-#     return render(request, 'booking/timeslot.html', context)
-
-# end GetSlot raw method
-    
-def GetSlot(request):
-    if request.method == 'POST':
-        doctor_id = request.POST.get('doctor_id')
-        date_start = request.POST.get('date_start')
-        date_stop = request.POST.get('date_stop')
-        try:
-            doctor = DoctorProfile_temp.objects.get(id=doctor_id)
-            date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
-            date_stop = datetime.strptime(date_stop, "%Y-%m-%d").date()
-
-            if date_start > date_stop:
-                return HttpResponseBadRequest("Invalid date range: date_start cannot be after date_stop")
-
-        except DoctorProfile_temp.DoesNotExist:
-            return HttpResponseBadRequest("Invalid doctor_id")
-
-        except ValueError:
-            return HttpResponseBadRequest("Invalid date format")
-
-        # Calculate the number of days required
-        duration_days = (date_stop - date_start).days + 1
-
-        # Get the number of available slots after date_start
-        available_slots = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start)
-        available_slots_count = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date__gt=date_start).count()
-
-        # Create a list of all dates from date_start to date_stop
-        date_range = [date_start + timedelta(days=i) for i in range((date_stop - date_start).days + 1)]
-
-        # Check if there is a TimeSlot for each date
-        timeslots_start = []
-        for date in date_range:
-            timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=date)
-            if timeslot.exists():
-                timeslots_start.append(timeslot.first())
-
-        error_message = ""
-        if len(timeslots_start) < len(date_range):
-            error_message = "Not enough available dates for the required number of days."
+    if len(appointment_requested) == duration_days:
+        success_message_first_choice = "dates are available"
+        appointment_requested_available = True
         
-            # Create a range of all timeslots or placeholders from date_start to date_stop
+    else:
         appointment_requested = []
-        appointment_requested_available = False
-        current_date = date_start
-        error_message_first_choice = ""
-        success_message_first_choice = ""
-        while current_date <= date_stop:
-            timeslot = TimeSlot.objects.filter(doctor_id=doctor_id, is_available=True, slot_start__date=current_date)
-            if timeslot.exists():
-                appointment_requested.append(timeslot.first())
-            else:
-                break
-            current_date += timedelta(days=1)
-
-        
-        if len(appointment_requested) == duration_days:
-            success_message_first_choice = "dates are available"
-            appointment_requested_available = True
-        else:
-            appointment_requested = []
-            error_message_first_choice = "Il n'y a pas de créneaux disponnibles à cette date pour le moment."
-
-        context = {
-            'doctor': doctor,
-            'date_start': date_start,
-            'date_stop': date_stop,
-            'duration_days': duration_days,
-            'timeslots_start': timeslots_start,
-            'error_message': error_message,
-            'success_message_first_choice': success_message_first_choice,
-            'available_slots': available_slots,
-            'available_slots_count': available_slots_count,
-            'error_message_first_choice': error_message_first_choice,
-            'appointment_requested': appointment_requested,
-            'appointment_requested_available': appointment_requested_available,
-        }
-
-        return render(request, 'booking/timeslot.html', context)
+        error_message_first_choice = "Il n'y a pas de créneaux disponnibles à cette date pour le moment."
 
 
-# ---------test get more slot----------------
+    context = {
+        'doctor': doctor,
+        'date_start': date_start,
+        'date_stop': date_stop,
+        'duration_days': duration_days,
+        'timeslots_start': timeslots_start,
+        'error_message': error_message,
+        'success_message_first_choice': success_message_first_choice,
+        'available_slots': available_slots,
+        'available_slots_count': available_slots_count,
+        'error_message_first_choice': error_message_first_choice,
+        'appointment_requested': appointment_requested,
+        'appointment_requested_available': appointment_requested_available,
+    }
+
+    return render(request, 'booking/timeslot.html', context)
+
 
 def GetMoreSlot(request, doctor_id, date_start, duration):
     doctor = DoctorProfile_temp.objects.get(id=doctor_id)
