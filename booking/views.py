@@ -171,7 +171,7 @@ class registerAppointment(View):
             form = AppointmentForm()  # Replace MyForm with the actual form class
             if form.is_valid():
                 form.save()
-                return JsonResponse({'message': 'Appointment created successfully'})
+                return redirect('prendre-rendez-vous')
             else:
                 return JsonResponse({'error': 'Invalid form data'}, status=400)
         else:
