@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from datetime import time, timedelta
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -44,9 +46,11 @@ class PatientProfile_temp(models.Model):
         return self.patientFullName
 
 class Appointment_temp(models.Model):
+    @staticmethod
     def get_default_start_time():
         return timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    
+
+    @staticmethod
     def get_default_end_time():
         return timezone.now().replace(hour=23, minute=59, second=59, microsecond=0)
     
@@ -61,10 +65,12 @@ class Appointment_temp(models.Model):
 
     def duration(self):
         return self.date_stop - self.date_start
-    
+
     def save(self, *args, **kwargs):
+        self.date_start = self.date_start.replace(hour=0, minute=0, second=0)
+        self.date_stop = self.date_stop.replace(hour=23, minute=59, second=59)
         if self.date_start >= self.date_stop:
-            raise ValidationError(_("date_start must be before date_stop"))
+            return 
         super().save(*args, **kwargs)
 
     class Meta:

@@ -131,6 +131,8 @@ var csrftoken = getCookie('csrftoken');
     }
   });
 
+  var data;
+  var requestDataCopy;
   //looking for missing fields in the form
     var buttonBooking = $("button[name='submitDateStopAndStart']");
     buttonBooking.click(function() {
@@ -189,9 +191,9 @@ var csrftoken = getCookie('csrftoken');
       } else {
           dateStop = dateStopVal;
       }
-
+      
       if (service && doctor && intervention && dateStart && dateStop) {
-        var data = {
+         data = {
           service: service,
           doctor: doctor,
           intervention: intervention,
@@ -206,12 +208,11 @@ var csrftoken = getCookie('csrftoken');
               "X-CSRFToken": csrftoken
           },
           success: function(response) {
-              console.log(response);
-              // $("p[name='validation']").text(response.duration_days).show();
               $("div[name='appoinmentValidation']").removeAttr("hidden");
               $("p[name='validation']").text(response.message).show();
               $("div[name='appoinmentValidation']").attr('tabindex', 0).focus();
-              
+              // Copy the request data
+              requestDataCopy = Object.assign({}, data);
           },
           error: function (jqXHR) {
             if (jqXHR.status == 400) {
@@ -230,8 +231,31 @@ var csrftoken = getCookie('csrftoken');
           },
         });
       }
-
   });
- 
-  //end of document ready
+
+  var buttonSubmitAppointment = $("button[name='submitAppointment']");
+  buttonSubmitAppointment.click(function() {
+    $.ajax({
+      url: "/register-appointment/" + requestDataCopy.intervention + "/" + requestDataCopy.doctor + "/" + requestDataCopy.dateStart + "/" + requestDataCopy.dateStop + "/",
+      // url: "/register_appointment/",
+      type: "GET",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "Content-Type": "application/json"
+      },
+      // data: JSON.stringify(requestDataCopy),
+      success: function(response) {
+        console.log(response);
+      },
+      error: function(jqXHR) {
+        if (jqXHR.status == 400) {
+          var response = JSON.parse(jqXHR.responseText);
+          console.log(response);
+        } else if (jqXHR.status == 405) {
+          var response = JSON.parse(jqXHR.responseText);
+          console.log(response);
+        }
+      }
+    });
+  });
 });
