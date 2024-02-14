@@ -134,6 +134,12 @@ var csrftoken = getCookie('csrftoken');
   //looking for missing fields in the form
     var buttonBooking = $("button[name='submitDateStopAndStart']");
     buttonBooking.click(function() {
+      var service = null;
+      var doctor = null;
+      var intervention = null;
+      var dateStart = null;
+      var dateStop = null;
+
       var selectedSertvice = Number($("select[name='service']").val());
       if (Number.isInteger(selectedSertvice) && selectedSertvice > 0) {
         service=selectedSertvice;
@@ -182,6 +188,47 @@ var csrftoken = getCookie('csrftoken');
           $("#dateStopErroMessage").text("Veuillez sélectionner une date de fin");
       } else {
           dateStop = dateStopVal;
+      }
+
+      if (service && doctor && intervention && dateStart && dateStop) {
+        var data = {
+          service: service,
+          doctor: doctor,
+          intervention: intervention,
+          dateStart: dateStart,
+          dateStop: dateStop,
+        };
+        console.log(data);
+        $.ajax({
+          url: "/create-appointment/" + service + "/" + intervention + "/" + doctor + "/" + dateStart + "/" + dateStop + "/",
+          type: "GET",
+          headers: {
+              "X-CSRFToken": csrftoken
+          },
+          success: function(response) {
+              console.log(response);
+              // $("p[name='validation']").text(response.duration_days).show();
+              $("div[name='appoinmentValidation']").removeAttr("hidden");
+              $("p[name='validation']").text(response.message).show();
+              $("div[name='appoinmentValidation']").attr('tabindex', 0).focus();
+              
+          },
+          error: function (jqXHR) {
+            if (jqXHR.status == 400) {
+              $("div[name='appoinmentValidation']").attr("hidden", true);
+              var response = JSON.parse(jqXHR.responseText);
+              if (response.errorDateStart) {
+                $("#dateStartErroMessage").text(response.errorDateStart).show();
+                $("p[name='dateStartErroMessage']").removeAttr("hidden");
+                $("input[name='dateStart']").css("border-color", "red");
+              } else if (response.errorDateStop) {
+                $("#dateStopErroMessage").text(response.errorDateStop).show();
+                $("p[name='dateStopErroMessage']").removeAttr("hidden");
+                dateStopInput.css("border-color", "red");
+              }
+            }
+          },
+        });
       }
 
   });
