@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title></title>
+  <link rel="stylesheet" href="{% static '/css/bootstrap.min.css' %}">
+  <link rel="icon" type="image/x-icon" href="{% static '/elements/logo/soignemoi-favicon-color.ico' %}">
+
+</head>
+
+<body>
+
+  <section class="section-conten padding-y bg">
+
+    {% include 'includes/alerts.html' %}
+    <div class="container">
+      <div class="row">
+        {% include 'includes/planning_dashboard_sidebar.html' %}
+        <main class="col-md-9">
+          <article class="card">
+            <header class="card-header">
+              <strong class="d-inline-block mr-3">Connecté en tant que:</strong>
+              <span>name</span>
+            </header>
+            <div class="card-body">
+              <div class="row">
+
+                <!-- start of doctorCreationForm -->
+
+                <div class="col-md-12">
+                  <div class="card" style="text-align:start;">
+                    <div class="card-body">
+                      <h5 class="card-title">Ajouter un nouveau docteur : </h5>
+                    </div>
+                  </div>
+                </div>
+                <div name="doctorCreationForm">
+
+                  <div class="col-md-12">
+                    <div class="card" style="text-align:center;">
+                      <div class="card-body">
+                        <form action="{% url 'doctorProfileAdmin' %}" method="post">
+                          {% csrf_token %}
+                          <div class="d-flex flex-column flex-lg-row justify-content-around">
+
+                            <div class="form-group px-2">
+                              <label for="first_name">Nom</label>
+                              {{ account_form.first_name }}
+                            </div>
+                            <div class="form-group px-2">
+                              <label for="last_name">Prénom</label>
+                              {{ account_form.last_name }}
+                            </div>
+                            <div class="form-group px-2">
+                              <label for="email">email</label>
+                              {{ account_form.username }}
+                            </div>
+
+                          </div>
+                          <hr>
+                          <div class="d-flex flex-column flex-lg-row justify-content-around align-items-center">
+                            <div class="form-group px-2">
+                              {{ doctor_form.service }}
+                            </div>
+                            <div class="form-group px-2">
+                              <label for="last_name">Spécialité</label>
+                              {{ doctor_form.speciality }}
+                            </div>
+                            <div class="form-group px-2">
+                              <button type="submit" class="btn btn-primary">Ajouter</button>
+                            </div>
+
+
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="card" style="text-align:start;">
+                      <div class="card-body">
+                        <h5 class="card-title">Docteurs : </h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- end of doctorCreationForm -->
+
+                <div class="col-md-12">
+                  <div class="card" style="text-align:start;">
+                    <div class="card-body">
+                      <h5 class="card-title">-liste des docteurs </h5>
+                    </div>
+                  </div>
+                </div>
+
+
+              </div> <!-- row.// -->
+            </div> <!-- card-body .// -->
+
+          </article> <!-- order-group.// -->
+        </main>
+      </div> <!-- row.// -->
+    </div>
+
+
+  </section>
