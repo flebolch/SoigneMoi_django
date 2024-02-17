@@ -11,7 +11,7 @@ class DoctorManager(BaseUserManager):
 
 
         if not username:
-            raise ValueError('User must have an username')
+            raise ValueError('Vous devez avoir un email pour vous inscrire')
 
         user = self.model(
             username = self.normalize_email(username),

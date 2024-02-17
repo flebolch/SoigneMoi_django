@@ -1,22 +1,8 @@
 from django import forms    
 from ..models import Account, DoctorProfile, Service_temp
-import random
-from datetime import date
+from ..models import Service_temp
 
-def GeneratePassordTemp():
-    pwdlenght = 10
-    characters = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()')
-    temp_password = ''.join(random.choice(characters) for i in range(pwdlenght))
-    return temp_password
 
-def generateMatricule():
-    current_date = date.today()
-    rndchar = ''.join([str(random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')) for _ in range(3)])
-    y = str(current_date.year)[-2:]
-    m = str(current_date.month).zfill(2)
-    random_number = ''.join([str(random.randint(0, 9)) for _ in range(2)])
-    matricule = f'{rndchar}{y}{m}{random_number}'
-    return matricule
 
 def choice_service():
     choice = Service_temp.objects.all()
@@ -27,6 +13,8 @@ def choice_service():
 
 class DoctorForm(forms.ModelForm):
     service = forms.ChoiceField(widget=forms.Select, choices=choice_service())
+    matricule = forms.CharField(required=False)
+    password_temp = forms.CharField(required=False)
     class Meta:
         model = DoctorProfile
         fields = ['user', 'service', 'speciality', 'matricule', 'password_temp']
@@ -35,15 +23,21 @@ class DoctorForm(forms.ModelForm):
             'speciality': forms.TextInput(attrs={'class': 'form-control'}),
         }
     
+    def clean_matricule(self):
+        matricule = self.cleaned_data.get('matricule')
+        if not matricule:
+            matricule = 'matriculeTMP'
+        return matricule
+       
     def __init__(self, *args, **kwargs):
         super(DoctorForm, self).__init__(*args, **kwargs)
         self.fields['service'].widget.attrs['class'] = 'choisissez un service'
         self.fields['speciality'].widget.attrs['placeholder'] = 'Spécialité'
-        self.initial['matricule'] = generateMatricule()
+        self.fields['matricule'].initial = 'matriculeTMP'
 
-       
 
 class AccountForm(forms.ModelForm):
+    password = forms.CharField(required=False)
     class Meta:
         model = Account
         fields = ['first_name', 'last_name', 'username', 'password']
@@ -57,5 +51,19 @@ class AccountForm(forms.ModelForm):
         self.fields['last_name'].widget.attrs['placeholder'] = 'Nom'
         self.fields['first_name'].widget.attrs['placeholder'] = 'Prénom'
         self.fields['username'].widget.attrs['placeholder'] = 'email'
-        self.initial['password_temp'] = GeneratePassordTemp()
-        
+        self.fields['password'].initial = 'P*ssw0rdTMP123'
+    
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if not password:    
+            password = 'P*ssw0rdTMP123'
+        return password
+    
+    def clean(self):
+        cleaned_data = super(AccountForm, self).clean()
+        username = cleaned_data.get('username')
+        if Account.objects.filter(username=username).exists():
+            raise forms.ValidationError(
+                "L'adresse email est déja utilisée."
+            ) 
+

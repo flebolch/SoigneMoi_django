@@ -11,5 +11,13 @@ $(document).ready(function() {
         $("#toggle-example").collapse('toggle'); // toggle collapse
     });
 
+    // Toggle collapse on click
+    $("#hide").click(function(){
+        $("#passord").hide();
+      });
+      $("#show").click(function(){
+        $("p").show();
+      });
+
 });
 // jquery end
