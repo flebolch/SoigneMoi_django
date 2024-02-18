@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, JsonResponse
 from .forms.newdoctor import DoctorForm, AccountForm
-from .models import Account, DoctorProfile
+from .models import Account, DoctorProfile, Service
+from django.views import View
 from django.contrib import messages
 import random
 from datetime import date
@@ -8,21 +10,41 @@ from django.db import transaction
 from django.contrib import messages
 from django.db import IntegrityError
 from .models import DoctorProfile
+from .models import DoctorProfile, Service
 
 
-def planningdashboard(request, matricule=None):
-    matricule = None
-
-    if matricule != None:
-        doctors = get_object_or_404(DoctorProfile, matricule=matricule)
-        print('matricule is not none', doctors)
-    else:
-        doctors = DoctorProfile.objects.all()
-        print('matricule is none')
+def planningdashboard(request):
+    doctors = DoctorProfile.objects.all()
     context = {
         'doctors': doctors
     }
     return render(request, 'planning/planningdashboard.html', context)
+
+class getDoctorProfile(View):
+    def get(self, request, doctor, *args, **kwargs):
+        doctorProfile = DoctorProfile.objects.filter(id=doctor)
+        serviceName = Service.objects.get(id=doctor)
+        doctorMail = doctorProfile.values('user__username')
+        doctorProfile_info = {
+            'doctorProfile': list(doctorProfile.values('speciality', 'matricule')),
+            'serviceName': serviceName.name,
+            'doctorMail': doctorMail[0]['user__username']
+        }
+        return JsonResponse(doctorProfile_info)
+    
+# def planningdashboard(request, DoctorProfile_slug=None):
+#     dotcors = None
+
+#     if DoctorProfile_slug != None:
+#         doctors = get_object_or_404(DoctorProfile, slug=DoctorProfile_slug)
+#         print('matricule is not none', doctors)
+#     else:
+#         doctors = DoctorProfile.objects.all()
+#         print('matricule is none')
+#     context = {
+#         'doctors': doctors
+#     }
+#     return render(request, 'planning/planningdashboard.html', context)
 
 
 def newDoctor(request):

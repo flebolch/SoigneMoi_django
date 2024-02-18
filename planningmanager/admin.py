@@ -5,7 +5,7 @@ from .models import Account, DoctorProfile, Service
 
 
 class DoctorProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user',  'speciality', 'matricule', 'password_temp')
+    list_display = ('id', 'full_name', 'user',  'speciality', 'matricule', 'password_temp')
     prepopulated_fields = {'slug': ('matricule',)}
 
     filter_horizontal = ()
