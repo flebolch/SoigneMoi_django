@@ -68,7 +68,7 @@ class Account(AbstractBaseUser):
 
 class DoctorProfile(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, blank=True, null=True)
-    service = models.OneToOneField(Service, on_delete=models.DO_NOTHING, blank=True, null=True)
+    service = models.ForeignKey(Service, on_delete=models.DO_NOTHING, blank=True, null=True, unique=False)
     speciality = models.CharField(max_length=30, blank=False)
     matricule = models.CharField(max_length=30, blank=False, unique=True)
     password_temp = models.CharField(max_length=30, blank=False)
@@ -79,10 +79,10 @@ class DoctorProfile(models.Model):
         verbose_name_plural = 'doctor profiles'
 
     def __str__(self):
-        return self.user.username
+        return self.full_name()
     
-    def __str__(self):
-        return self.service.name
+    # def __str__(self):
+    #     return self.service.name
     
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name
@@ -91,4 +91,37 @@ class DoctorProfile(models.Model):
         if not self.slug:
             self.slug = slugify(self.matricule)
         super().save(*args, **kwargs)
+    
+# booking final model 
+class TimeSlot(models.Model):
+    def get_default_start_time():
+        return timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    slot_start = models.DateTimeField(default=get_default_start_time, blank=False, null=False)
+    slot_end = models.DateTimeField(blank=True, null=True)
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE)
+    is_available = models.BooleanField(default=True)
+    patient_available = models.IntegerField(default=5)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'time_slot'
+        verbose_name_plural = 'time_slots'
+
+    class Meta:
+        unique_together = ('doctor', 'slot_start')
+
+    def __str__(self):
+        return f"TimeSlot {self.slot_start} - {self.slot_end}"
+        
+    
+    def __str__(self):
+        return f"TimeSlot {self.slot_start} - {self.slot_end}, Doctor: {self.doctor.full_name()}"
+    
+    def save(self, *args, **kwargs):
+        # Set slot_end to the end of the day
+        if not self.slot_end:
+            self.slot_end = self.slot_start.replace(hour=23, minute=59, second=59)
+        super().save(*args, **kwargs)
+    
     

@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Account, DoctorProfile, Service
+from .models import Account, DoctorProfile, Service, TimeSlot
 
 # Register your models here.
 
 
 class DoctorProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'full_name', 'user',  'speciality', 'matricule', 'password_temp')
+    list_display = ('id', 'full_name', 'user', 'service',  'speciality', 'matricule', 'password_temp')
     prepopulated_fields = {'slug': ('matricule',)}
 
     filter_horizontal = ()
@@ -25,6 +25,18 @@ class serviceAdmin(admin.ModelAdmin):
     filter_horizontal = ()
     list_filter = ()
     fieldsets = ()
+
+class timeslotAdmin(admin.ModelAdmin):
+    list_display = ('id', 'slot_start', 'doctor', 'patient_available', 'is_available')
+    list_filter = ['TimeSlot_day','doctor', 'slot_start', 'patient_available', 'is_available']
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+
+
+
 admin.site.register(Service, serviceAdmin)
 admin.site.register(DoctorProfile, DoctorProfileAdmin)
 admin.site.register(Account, AccountAdmin)
+admin.site.register(TimeSlot, timeslotAdmin)

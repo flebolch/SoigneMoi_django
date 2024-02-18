@@ -5,7 +5,14 @@ from ..models import Service
 
 
 class DoctorForm(forms.ModelForm):
-    service = forms.ModelChoiceField(queryset=Service.objects.all(), widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Choisissez un service'}))
+    # service = forms.ModelChoiceField(queryset=Service.objects.all(), widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Choisissez un service'}))
+    # print('service', service)
+    service = forms.ModelChoiceField(
+        queryset=Service.objects.all(), 
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label="Choisissez un service",
+        required=True
+        )
     matricule = forms.CharField(required=False)
     password_temp = forms.CharField(required=False)
     class Meta:
@@ -23,7 +30,7 @@ class DoctorForm(forms.ModelForm):
        
     def __init__(self, *args, **kwargs):
         super(DoctorForm, self).__init__(*args, **kwargs)
-        self.fields['service'].widget.attrs['placeholder'] = 'choisissez un service'
+        # self.fields['service'].widget.attrs['placeholder'] = 'choisissez un service'
         self.fields['speciality'].widget.attrs['placeholder'] = 'Spécialité'
         self.fields['matricule'].initial = 'matriculeTMP'
 

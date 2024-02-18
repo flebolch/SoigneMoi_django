@@ -9,8 +9,7 @@ from datetime import date
 from django.db import transaction
 from django.contrib import messages
 from django.db import IntegrityError
-from .models import DoctorProfile
-from .models import DoctorProfile, Service
+from .models import DoctorProfile, Service, TimeSlot
 
 
 def planningdashboard(request):
@@ -25,27 +24,20 @@ class getDoctorProfile(View):
         doctorProfile = DoctorProfile.objects.filter(id=doctor)
         serviceName = Service.objects.get(id=doctor)
         doctorMail = doctorProfile.values('user__username')
+        doctorTimeslots = TimeSlot.objects.filter(doctor=doctor)
+
+        # Now you can use doctorTimeslots
+        for timeslot in doctorTimeslots:
+            print(timeslot.slot_start)
+
         doctorProfile_info = {
             'doctorProfile': list(doctorProfile.values('speciality', 'matricule')),
             'serviceName': serviceName.name,
-            'doctorMail': doctorMail[0]['user__username']
+            'doctorMail': doctorMail[0]['user__username'],
+            'doctorTimeslots': list(doctorTimeslots.values('slot_start')),
         }
         return JsonResponse(doctorProfile_info)
     
-# def planningdashboard(request, DoctorProfile_slug=None):
-#     dotcors = None
-
-#     if DoctorProfile_slug != None:
-#         doctors = get_object_or_404(DoctorProfile, slug=DoctorProfile_slug)
-#         print('matricule is not none', doctors)
-#     else:
-#         doctors = DoctorProfile.objects.all()
-#         print('matricule is none')
-#     context = {
-#         'doctors': doctors
-#     }
-#     return render(request, 'planning/planningdashboard.html', context)
-
 
 def newDoctor(request):
     if request.method == 'POST':
@@ -71,6 +63,7 @@ def newDoctor(request):
                     # create doctor profile
                     doctor.user = user
                     service = doctor_form.cleaned_data['service']
+                    print('line 38 views.py Servive is :',service)
                     speciality = doctor_form.cleaned_data['speciality']
                     matricule = generateMatricule(first_name, last_name)
                     doctor = DoctorProfile.objects.create(user=user, service=service, speciality=speciality, matricule=matricule, password_temp=new_password_tmp)
