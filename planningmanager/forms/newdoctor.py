@@ -1,25 +1,17 @@
 from django import forms    
-from ..models import Account, DoctorProfile, Service_temp
-from ..models import Service_temp
+from ..models import Account, DoctorProfile, Service
+from ..models import Service
 
 
-
-def choice_service():
-    choice = Service_temp.objects.all()
-    service_list = []
-    for i in choice:
-        service_list.append((i.id, i.name))
-    return service_list
 
 class DoctorForm(forms.ModelForm):
-    service = forms.ChoiceField(widget=forms.Select, choices=choice_service())
+    service = forms.ModelChoiceField(queryset=Service.objects.all(), widget=forms.Select(attrs={'class': 'form-control', 'placeholder': 'Choisissez un service'}))
     matricule = forms.CharField(required=False)
     password_temp = forms.CharField(required=False)
     class Meta:
         model = DoctorProfile
         fields = ['user', 'service', 'speciality', 'matricule', 'password_temp']
         widgets = {
-            'service': forms.ChoiceField(widget=forms.Select, choices=choice_service()),
             'speciality': forms.TextInput(attrs={'class': 'form-control'}),
         }
     
@@ -31,7 +23,7 @@ class DoctorForm(forms.ModelForm):
        
     def __init__(self, *args, **kwargs):
         super(DoctorForm, self).__init__(*args, **kwargs)
-        self.fields['service'].widget.attrs['class'] = 'choisissez un service'
+        self.fields['service'].widget.attrs['placeholder'] = 'choisissez un service'
         self.fields['speciality'].widget.attrs['placeholder'] = 'Spécialité'
         self.fields['matricule'].initial = 'matriculeTMP'
 

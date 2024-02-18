@@ -3,8 +3,19 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.utils import timezone
 from datetime import time, timedelta
+from django.utils.text import slugify
 
-# Create your models here.
+
+class Service(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'service'
+        verbose_name_plural = 'services'
+
+    def __str__(self):
+        return self.name
+      
 
 class DoctorManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, password=None):
@@ -53,14 +64,15 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, add_label):
         return True
-    
+
 
 class DoctorProfile(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE, blank=True, null=True)
-    service = models.CharField(max_length=30, blank=True)
+    service = models.OneToOneField(Service, on_delete=models.DO_NOTHING, blank=True, null=True)
     speciality = models.CharField(max_length=30, blank=False)
     matricule = models.CharField(max_length=30, blank=False, unique=True)
     password_temp = models.CharField(max_length=30, blank=False)
+    slug = models.SlugField(max_length=30, blank=True, unique=True)
 
     class Meta:
         verbose_name = 'doctor profile'
@@ -69,17 +81,14 @@ class DoctorProfile(models.Model):
     def __str__(self):
         return self.user.username
     
+    def __str__(self):
+        return self.service.name
+    
     def full_name(self):
         return self.user.first_name.upper() + " " + self.user.last_name
     
-# Create your models here.
-class Service_temp(models.Model):
-    name = models.CharField(max_length=100)
-
-    class Meta:
-        verbose_name = 'service'
-        verbose_name_plural = 'services'
-
-    def __str__(self):
-        return self.name
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.matricule)
+        super().save(*args, **kwargs)
     

@@ -1,17 +1,12 @@
 from django.contrib import admin
-from .models import Account, DoctorProfile, Service_temp
+from .models import Account, DoctorProfile, Service
 
 # Register your models here.
-class serviceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-
-    filter_horizontal = ()
-    list_filter = ()
-    fieldsets = ()
 
 
 class DoctorProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'service', 'speciality', 'matricule', 'password_temp')
+    list_display = ('id', 'user',  'speciality', 'matricule', 'password_temp')
+    prepopulated_fields = {'slug': ('matricule',)}
 
     filter_horizontal = ()
     list_filter = ()
@@ -24,6 +19,12 @@ class AccountAdmin(admin.ModelAdmin):
     list_filter = ()
     fieldsets = ()
 
-admin.site.register(Service_temp, serviceAdmin)
+class serviceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+admin.site.register(Service, serviceAdmin)
 admin.site.register(DoctorProfile, DoctorProfileAdmin)
 admin.site.register(Account, AccountAdmin)

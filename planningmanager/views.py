@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from .forms.newdoctor import DoctorForm, AccountForm
 from .models import Account, DoctorProfile
 from django.contrib import messages
@@ -7,6 +7,23 @@ from datetime import date
 from django.db import transaction
 from django.contrib import messages
 from django.db import IntegrityError
+from .models import DoctorProfile
+
+
+def planningdashboard(request, matricule=None):
+    matricule = None
+
+    if matricule != None:
+        doctors = get_object_or_404(DoctorProfile, matricule=matricule)
+        print('matricule is not none', doctors)
+    else:
+        doctors = DoctorProfile.objects.all()
+        print('matricule is none')
+    context = {
+        'doctors': doctors
+    }
+    return render(request, 'planning/planningdashboard.html', context)
+
 
 def newDoctor(request):
     if request.method == 'POST':
@@ -80,4 +97,3 @@ def generateMatricule(first_name, last_name):
 def listDoctors(request):
     doctors = DoctorProfile.objects.all()
     return render(request, 'planning/listdoctors.html', {'doctors': doctors})
-    return matricule
