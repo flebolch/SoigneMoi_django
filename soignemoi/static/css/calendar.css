@@ -52,6 +52,11 @@ body {font-family: Verdana, sans-serif;}
   margin: 0;
 }
 
+.noday{
+  table-layout: fixed;
+  background: #ddd;
+}
+
 .days li {
   list-style-type: none;
   display: inline-block;
@@ -66,6 +71,16 @@ body {font-family: Verdana, sans-serif;}
   padding: 5px;
   background: #1abc9c;
   color: white !important
+}
+
+.days td .active {
+  padding: 5px;
+  background: #1abc9c;
+  color: white !important
+}
+
+.days td.active {
+  color: green;
 }
 
 table {
