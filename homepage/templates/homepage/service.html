@@ -2,7 +2,7 @@
 
 <!-- details of service -->
 
-
+{% if serivice %}
 <div class="container">
     <div class="bg-light bg-primary py-3 py-sm-5 mt-4">
         <div id="serviceDetails" class="row align-items-center">
@@ -20,7 +20,6 @@
                         <tr>
                             <th scope="col">Nom</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Nombre de d'hospitalisation</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -28,7 +27,6 @@
                         <tr>
                             <td>{{ intervention.name }}</td>
                             <td>{{ intervention.description }}</td>
-                            <td>{{ intervention.duration }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -52,6 +50,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- end of service details -->
 

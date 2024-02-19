@@ -11,7 +11,7 @@ class ServiceAdmin(admin.ModelAdmin):
     short_description.short_description = 'Description'
 
 class InterventionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'duration', 'service', 'short_description')
+    list_display = ('name', 'service', 'short_description')
     list_filter = ('service',)
     search_fields = ('name', 'service__name')
 

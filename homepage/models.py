@@ -17,7 +17,6 @@ class Service(models.Model):
     
 class Intervention(models.Model):
     name = models.CharField(max_length=100)
-    duration = models.PositiveSmallIntegerField() 
     description = models.TextField(max_length=500, blank=True)
     service = models.ForeignKey(Service, blank=True, null=True, on_delete=models.CASCADE)
 
