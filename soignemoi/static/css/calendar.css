@@ -83,6 +83,20 @@ body {font-family: Verdana, sans-serif;}
   color: green;
 }
 
+.dayAvailable {
+  font-weight: bold;
+  background-color: green;
+  color: white;
+  border-radius: 20px;
+}
+
+.daySelected {
+  font-weight: bold;
+  background-color: blue;
+  color: white;
+  border-radius: 20px;
+}
+
 table {
   table-layout: fixed;
   width: 100%;

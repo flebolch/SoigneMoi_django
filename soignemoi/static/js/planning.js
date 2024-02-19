@@ -16,6 +16,58 @@ $(document).ready(function () {
   }
   var csrftoken = getCookie("csrftoken");
 
+  // Add a click event listener to the document
+  document.addEventListener("click", function (event) {
+    // Check if the clicked element has the class daySelected
+    if (event.target.classList.contains("daySelected")) {
+      // Get the text within the span
+      var content = this.textContent;
+
+      // Replace the span with its text content
+      this.innerHTML = content;
+    }
+  });
+
+  var buttonSelected = $("button[name='addSelected']");
+
+  buttonSelected.click(function () {
+    //put all date in an array
+    var dates = [];
+    var tds = document.getElementsByTagName("td");
+    for (var i = 0; i < tds.length; i++) {
+      if (tds[i].getElementsByClassName("daySelected").length === 1) {
+        dates.push(tds[i].textContent);
+      }
+    }
+    //if the array is not empty send the dates to the server
+    if (dates.length > 0) {
+      $.ajax({
+        type: "POST",
+        url: "/add-appointment/",
+        headers: { "X-CSRFToken": csrftoken },
+        data: {
+          dates: dates,
+          doctor_id: doctor_id,
+          dateStr: dateStr,
+        },
+        success: function (response) {
+          console.log(response);
+          if (response.status === "success") {
+            alert("Rendez-vous ajouté avec succès");
+            location.reload();
+          } else {
+            alert("Une erreur s'est produite lors de l'ajout du rendez-vous");
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error: " + textStatus, errorThrown);
+        },
+      });
+    } else {
+      alert("Veuillez sélectionner au moins une date");
+    }
+  });
+
   // Get doctor's planning
   var doctor_id = $("#doctor_id").val();
   var dateStr = null;
@@ -56,7 +108,7 @@ $(document).ready(function () {
 
   function fetchCalendar(dateStr, doctor_id) {
     $.ajax({
-      url: "/selectedMonth/" + dateStr + "/",
+      url: "/selectedMonth/" + dateStr + "/" + doctor_id + "/",
       type: "GET",
       headers: { "X-CSRFToken": csrftoken },
       success: function (data) {
@@ -87,22 +139,53 @@ $(document).ready(function () {
       // The element does not exist
       console.log('Element with class "prev" does not exist.');
     }
-    
+
     if ($(".next").length > 0) {
       console.log('Element with class "next" exists.');
       document.querySelector(".next").addEventListener("click", function () {
         //On click of the next button, get the next month
-        console.log("Next button clicked")
+        console.log("Next button clicked");
         var nextDate = dateStr;
         console.log(nextDate);
         fetchCalendar(addOneMonth(nextDate), doctor_id);
       });
+
+      // Select all td elements
+      var tds = document.getElementsByTagName("td");
+
+      // Add an event listener to each td
+      for (var i = 0; i < tds.length; i++) {
+        tds[i].addEventListener("click", function (event) {
+          // Check if the td contains a span with the class dayAvailable
+          if (this.getElementsByClassName("dayAvailable").length === 0) {
+            // Check if the td's content is a number
+            var content = this.textContent;
+            var day = parseInt(content);
+            if (!isNaN(day) && day >= 1 && day <= 31) {
+              // Add a span with the class daySelected around the td's content
+              this.innerHTML =
+                '<span class="daySelected">' + content + "</span>";
+            }
+          }
+        });
+      }
+
+      // Select all elements with the class daySelected
+      var selectedDays = document.getElementsByClassName("daySelected");
+
+      // Add a click event listener to each element
+      for (var i = 0; i < selectedDays.length; i++) {
+        selectedDays[i].addEventListener("click", function () {
+          var content = this.textContent;
+          console.log(content);
+        });
+      }
     } else {
       // The element does not exist
       console.log('Element with class "next" does not exist.');
     }
   }
-    
+
   function subtractOneMonth(dateStr) {
     // Create a Date object from the date string
     var date = new Date(dateStr);

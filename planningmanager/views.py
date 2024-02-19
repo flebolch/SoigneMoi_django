@@ -12,36 +12,49 @@ import random, re
 from calendar import HTMLCalendar
 
 class monthCalendar(View):
-    def get(self, request, date):
+    def get(self, request, date, doctor):
+        date = date
+        doctor = doctor
         year, month = date.split('-')
+        doctorTimeslots = getTimeslots(request, doctor)
         year = int(year)
         month = int(month)
+        monthDoctorTimeslots = filterTimeslots(request, doctorTimeslots, year, month)
+        print('monthDoctorTimeslots:', monthDoctorTimeslots)
+        print(year, month)
         month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         month_number = int(month) - 1
         month_name = month_names[month_number]
         calendar = HTMLCalendar()
         html_calendar = calendar.formatmonth(year, month)
         html_calendar = processCalendar(html_calendar, year, month_name)
+        html_calendar = addActualTimeslots(html_calendar, monthDoctorTimeslots)
         return HttpResponse(html_calendar)
+    
+def addActualTimeslots(html_calendar, monthDoctorTimeslots): 
+    for day in monthDoctorTimeslots:
+        html_calendar = re.sub(rf'<td class="(.*?)">{day}</td>', rf'<td class="\1"><span class="dayAvailable">{day}</span></td>', html_calendar)
+    return html_calendar
+
+def getTimeslots(request, doctor):
+    timelots = TimeSlot.objects.filter(doctor=doctor)
+    print('timelots:', timelots)
+    doctorTimeslots = []
+    for timeslot in timelots:
+        doctorTimeslots.append(timeslot.slot_start.strftime('%Y-%m-%d'))
+    return doctorTimeslots
+
+def filterTimeslots(request, doctorTimeslots, year, month):
+    monthDoctorTimeslots = []
+    for timeslot in doctorTimeslots:
+        slot_year, slot_month, slot_day = timeslot.split('-')
+        if int(slot_year) == year and int(slot_month) == month:
+            monthDoctorTimeslots.append(slot_day)
+    return monthDoctorTimeslots
+
+
 
 def processCalendar(html_calendar, year, month_name):
-    # Create a dictionary with the English day names as keys and the French day names as values
-    # day_names = {
-    #     '<th class="mon">Mon</th>': '<th class="mon">Lun</th>',
-    #     '<th class="tue">Tue</th>': '<th class="tue">Mar</th>',
-    #     '<th class="wed">Wed</th>': '<th class="wed">Mer</th>',
-    #     '<th class="thu">Thu</th>': '<th class="thu">Jeu</th>',
-    #     '<th class="fri">Fri</th>': '<th class="fri">Ven</th>',
-    #     '<th class="sat">Sat</th>': '<th class="sat">Sam</th>',
-    #     '<th class="sun">Sun</th>': '<th class="sun">Dim</th>'
-    # }
-
-    # # Loop over the dictionary and replace each English day name with the corresponding French day name
-    # for eng, fre in day_names.items():
-    #     html_calendar = html_calendar.replace(eng, fre)
-    
-    print('year:', year) 
-    print('month_en:', month_name)
 
     #Convert the month into French
     month_eng_to_fre = {
@@ -60,9 +73,6 @@ def processCalendar(html_calendar, year, month_name):
     }
     # Get the French month name
     fre_month_name = month_eng_to_fre[month_name]
-
-
-    print ('month:', fre_month_name)
 
     #Removes the year from the month name
     html_calendar = re.sub(r'(?<=<tr><th colspan="7" class="month">).+?(?=</th></tr>)', '', html_calendar)
@@ -93,21 +103,13 @@ class getDoctorProfile(View):
         doctorProfile = DoctorProfile.objects.filter(id=doctor)
         timeslots= getTimeslots(request, doctor)
 
-        # Now you can use doctorTimeslots
-        # for timeslot in doctorTimeslots:
-        #     print(timeslot.slot_start)
-
         doctorProfile_info = {
             'doctorProfile': list(doctorProfile.values('speciality', 'matricule', 'service__name', 'user__username')),
             'timeslots': timeslots
         }
         return JsonResponse(doctorProfile_info)
     
-def getTimeslots(request, doctor):
-    doctorTimeslots = TimeSlot.objects.filter(doctor=doctor)
-    timeslots_serialized = serializers.serialize('json', doctorTimeslots)
-    return timeslots_serialized
-    
+
 
 def newDoctor(request):
     if request.method == 'POST':
