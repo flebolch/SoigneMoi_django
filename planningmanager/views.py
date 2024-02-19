@@ -4,39 +4,109 @@ from .forms.newdoctor import DoctorForm, AccountForm
 from .models import Account, DoctorProfile, Service
 from django.views import View
 from django.contrib import messages
-import random
 from datetime import date
-from django.db import transaction
-from django.contrib import messages
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
+from django.core import serializers
 from .models import DoctorProfile, Service, TimeSlot
+import random, re
+from calendar import HTMLCalendar
 
+class monthCalendar(View):
+    def get(self, request, date):
+        year, month = date.split('-')
+        year = int(year)
+        month = int(month)
+        month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        month_number = int(month) - 1
+        month_name = month_names[month_number]
+        calendar = HTMLCalendar()
+        html_calendar = calendar.formatmonth(year, month)
+        html_calendar = processCalendar(html_calendar, year, month_name)
+        return HttpResponse(html_calendar)
+
+def processCalendar(html_calendar, year, month_name):
+    # Create a dictionary with the English day names as keys and the French day names as values
+    # day_names = {
+    #     '<th class="mon">Mon</th>': '<th class="mon">Lun</th>',
+    #     '<th class="tue">Tue</th>': '<th class="tue">Mar</th>',
+    #     '<th class="wed">Wed</th>': '<th class="wed">Mer</th>',
+    #     '<th class="thu">Thu</th>': '<th class="thu">Jeu</th>',
+    #     '<th class="fri">Fri</th>': '<th class="fri">Ven</th>',
+    #     '<th class="sat">Sat</th>': '<th class="sat">Sam</th>',
+    #     '<th class="sun">Sun</th>': '<th class="sun">Dim</th>'
+    # }
+
+    # # Loop over the dictionary and replace each English day name with the corresponding French day name
+    # for eng, fre in day_names.items():
+    #     html_calendar = html_calendar.replace(eng, fre)
+    
+    print('year:', year) 
+    print('month_en:', month_name)
+
+    #Convert the month into French
+    month_eng_to_fre = {
+        'January': 'Janvier',
+        'February': 'Février',
+        'March': 'Mars',
+        'April': 'Avril',
+        'May': 'Mai',
+        'June': 'Juin',
+        'July': 'Juillet',
+        'August': 'Août',
+        'September': 'Septembre',
+        'October': 'Octobre',
+        'November': 'Novembre',
+        'December': 'Décembre'
+    }
+    # Get the French month name
+    fre_month_name = month_eng_to_fre[month_name]
+
+
+    print ('month:', fre_month_name)
+
+    #Removes the year from the month name
+    html_calendar = re.sub(r'(?<=<tr><th colspan="7" class="month">).+?(?=</th></tr>)', '', html_calendar)
+
+    # Add the French month name and the year to the calendar
+    # html_calendar = html_calendar.replace('<table border="0" cellpadding="0" cellspacing="0" class="month"><tr><th colspan="7" class="month"></th></tr>', f'<divclass="month"><ul><liclass="prev">&#10094;</li><liclass="next">&#10095;</li><li>{fre_month_name}<br><spanstyle="font-size:18px">{year}</span></li></ul></div>')
+    # html_calendar = re.sub(r'<table border="0" cellpadding="0" cellspacing="0" class="month">\n<tr><th colspan="7" class="month"></th></tr>', '', html_calendar)
+    html_calendar = re.sub(r'<table border="0" cellpadding="0" cellspacing="0" class="month">', '', html_calendar)
+    # prepend = f'<div class="month"><ul><li class="prev">&#10094;</li><li class="next">&#10095;</li><li>{fre_month_name}<br><span style="font-size:18px">{year}</span></li></ul></div><ul class="weekdays"><li>Lun</li><li>Mar</li><li>Mer</li<li>jeu</li><li>Ven</li><li>Sam</li><li>Dim</li></ul><table border="0" cellpadding="0" cellspacing="0" class="month"><tr><th colspan="7" class="month"></th></tr>'
+    # prepend = f'<div class="month"><ul><li class="prev">&#10094;</li><li class="next">&#10095;</li><li>{fre_month_name}<br><span style="font-size:18px">{year}</span></li></ul></div><ul class="weekdays"><table border="0" cellpadding="0" cellspacing="0" class="month"><tr><th colspan="7" class="month"></th></tr><tr class="weekdays"><th class="mon">Lun</th><th class="tue">Mar</th><th class="wed">Mer</th><th class="thu">Jeu</th><th class="fri">Ven</th><th class="sat">Sam</th><th class="sun">Dim</th></tr>'
+    # prepend = f'<div class="month"><ul><li class="prev">&#10094;</li><li class="next">&#10095;</li><li>{fre_month_name}<br><span style="font-size:18px">{year}</span></li></ul></div><ul class="weekdays"><table border="0" cellpadding="0" cellspacing="0" class="month"><tr><th colspan="7" class="month"></th></tr><tr class="weekdays"><td class="mon">Lun</td><td class="tue">Mar</td><td class="wed">Mer</td><td class="thu">Jeu</td><td class="fri">Ven</td><td class="sat">Sam</td><td class="sun">Dim</td></tr>'
+    prepend = f'<div class="month"><ul><li class="prev">&#10094;</li><li class="next">&#10095;</li><li>{fre_month_name}<br><span style="font-size:18px">{year}</span></li></ul></div><ul class="weekdays"><table border="0" cellpadding="0" cellspacing="0" class="month"></tr><tr class="weekdays"><td class="mon">Lun</td><td class="tue">Mar</td><td class="wed">Mer</td><td class="thu">Jeu</td><td class="fri">Ven</td><td class="sat">Sam</td><td class="sun">Dim</td></tr>'
+    html_calendar = prepend + html_calendar
+    html_calendar = re.sub(r'<tr><th class="mon">Mon</th><th class="tue">Tue</th><th class="wed">Wed</th><th class="thu">Thu</th><th class="fri">Fri</th><th class="sat">Sat</th><th class="sun">Sun</th></tr>', '', html_calendar)
+    html_calendar = re.sub(r'<th colspan="7" class="month"></th></tr>', '', html_calendar)
+    html_calendar = html_calendar.replace('<tr><td', '<tr class="days"><td')
+    return html_calendar
 
 def planningdashboard(request):
     doctors = DoctorProfile.objects.all()
     context = {
         'doctors': doctors
     }
-    return render(request, 'planning/planningdashboard.html', context)
+    return render(request, 'planningmanager/planningdashboard.html', context)
 
 class getDoctorProfile(View):
     def get(self, request, doctor, *args, **kwargs):
         doctorProfile = DoctorProfile.objects.filter(id=doctor)
-        serviceName = Service.objects.get(id=doctor)
-        doctorMail = doctorProfile.values('user__username')
-        doctorTimeslots = TimeSlot.objects.filter(doctor=doctor)
+        timeslots= getTimeslots(request, doctor)
 
         # Now you can use doctorTimeslots
-        for timeslot in doctorTimeslots:
-            print(timeslot.slot_start)
+        # for timeslot in doctorTimeslots:
+        #     print(timeslot.slot_start)
 
         doctorProfile_info = {
-            'doctorProfile': list(doctorProfile.values('speciality', 'matricule')),
-            'serviceName': serviceName.name,
-            'doctorMail': doctorMail[0]['user__username'],
-            'doctorTimeslots': list(doctorTimeslots.values('slot_start')),
+            'doctorProfile': list(doctorProfile.values('speciality', 'matricule', 'service__name', 'user__username')),
+            'timeslots': timeslots
         }
         return JsonResponse(doctorProfile_info)
+    
+def getTimeslots(request, doctor):
+    doctorTimeslots = TimeSlot.objects.filter(doctor=doctor)
+    timeslots_serialized = serializers.serialize('json', doctorTimeslots)
+    return timeslots_serialized
     
 
 def newDoctor(request):
@@ -76,20 +146,20 @@ def newDoctor(request):
                 
         except IntegrityError:
             messages.error(request, 'Adresse email déjà utilisée')
-            return render(request, 'planning/newDoctorProfile.html', {'doctor_form': doctor_form, 'account_form': account_form})
+            return render(request, 'planningmanager/newDoctorProfile.html', {'doctor_form': doctor_form, 'account_form': account_form})
 
         else:
             for field, errors in account_form.errors.items():
                 for error in errors:
                     messages.error(request, error, extra_tags='danger')
-            return render(request, 'planning/newDoctorProfile.html', {'doctor_form': doctor_form, 'account_form': account_form})
+            return render(request, 'planningmanager/newDoctorProfile.html', {'doctor_form': doctor_form, 'account_form': account_form})
     else:
 
         context = {
             'doctor_form': DoctorForm(),
             'account_form': AccountForm()
         }
-    return render(request, 'planning/newDoctorProfile.html', context)
+    return render(request, 'planningmanager/newDoctorProfile.html', context)
 
 
 
@@ -111,4 +181,4 @@ def generateMatricule(first_name, last_name):
 
 def listDoctors(request):
     doctors = DoctorProfile.objects.all()
-    return render(request, 'planning/listdoctors.html', {'doctors': doctors})
+    return render(request, 'planningmanager/listdoctors.html', {'doctors': doctors})

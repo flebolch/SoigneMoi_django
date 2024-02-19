@@ -1,0 +1,179 @@
+{% extends 'includes/base.html' %}
+
+{% block content %}
+
+
+
+
+
+<section>
+
+  {% include 'includes/alerts.html' %}
+  <div class="col-md-12">
+    <div class="row">
+      {% include 'includes/planning_dashboard_sidebar.html' %}
+      <main class="col-md-9">
+        <article class="card">
+          <header class="card-header">
+            <strong class="d-inline-block mr-3">Connecté en tant que:</strong>
+            <span>name</span>
+          </header>
+          <div class="card-body">
+            <div class="row">
+
+              <!-- start of doctor planning selction -->
+
+              <div class="col-md-12">
+                <div class="card" style="text-align:start;">
+                  <div class="card-body">
+                    <h5 class="card-title">Choisicez le docteur dont vous voulez gérer le planning : </h5>
+                  </div>
+                </div>
+              </div>
+              <div name="doctorPlanningSelectionForm">
+
+                <div class="col-md-12">
+                  <div class="card" style="text-align:center;">
+                    <div class="card-body">
+                      <form action="{% url 'newDoctor' %}" method="post">
+                        {% csrf_token %}
+                        <div class="d-flex flex-column flex-lg-row justify-content-around">
+
+                          <div class="form-group px-2">
+                            <label>Choix du docteur</label>
+                            <select class="form-select" aria-label="Select Service" name="doctor">
+                              <option value="">Choisir Docteur</option>
+                              {% for doctor in doctors %}
+                              <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+                              {% endfor %}
+                            </select>
+
+                          </div>
+
+                          <div class="form-group px-2">
+                            <label>Service</label>
+                            <p name="docteur_service"></p>
+                          </div>
+                          <div class="form-group px-2">
+                            <label>Spécialité </label>
+                            <p name="doctor_speciality"></p>
+                          </div>
+                          <div class="form-group px-2">
+                            <label>Matricule</label>
+                            <p name="doctor_matricule"></p>
+                          </div>
+                          <div class="form-group px-2">
+                            <label>Addresse Mail</label>
+                            <p name="doctor_email"></p>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+
+                  </head>
+
+                  <body>
+                    <div id='calendar'></div>
+                  </body>
+
+                  <!-- end of doctor Selection  -->
+
+                </div> <!-- row.// -->
+                <div class="col-md-12">
+                  <div id='calendar'></div>
+
+                  <div class="card" style="text-align:center;">
+                    <div class="card-body">
+                      <h5 class="card-title">Planning du docteur : </h5>
+                    </div>
+<hr>
+                    <div name="monthCalendar" class="pt-3"></div>
+<hr>
+
+
+
+                    <div class="">
+
+                      <div class="">
+                        <div class="form-group px-2" id="calendar">
+                          <label>Choix du mois</label>
+                          <input type="month" id="start" name="start" min="2024-01" value="2025-01" />
+
+
+                          <h1>CSS Calendar original</h1>
+
+                          <div class="month">
+                            <ul>
+                              <li class="prev">&#10094;</li>
+                              <li class="next">&#10095;</li>
+                              <li>
+                                August<br>
+                                <span style="font-size:18px">2021</span>
+                              </li>
+                            </ul>
+                          </div>
+
+                          <ul class="weekdays">
+                            <li>Lun</li>
+                            <li>Mar</li>
+                            <li>Mer</li>
+                            <li>jeu</li>
+                            <li>Ven</li>
+                            <li>Sam</li>
+                            <li>Dim</li>
+                          </ul>
+
+                          <ul class="days">
+                            <li>1</li>
+                            <li>2</li>
+                            <li>3</li>
+                            <li>4</li>
+                            <li>5</li>
+                            <li>6</li>
+                            <li>7</li>
+                            <li>8</li>
+                            <li>9</li>
+                            <li><span class="active">10</span></li>
+                            <li>11</li>
+                            <li>12</li>
+                            <li>13</li>
+                            <li>14</li>
+                            <li>15</li>
+                            <li>16</li>
+                            <li>17</li>
+                            <li>18</li>
+                            <li>19</li>
+                            <li>20</li>
+                            <li>21</li>
+                            <li>22</li>
+                            <li>23</li>
+                            <li>24</li>
+                            <li>25</li>
+                            <li>26</li>
+                            <li>27</li>
+                            <li>28</li>
+                            <li>29</li>
+                            <li>30</li>
+                            <li>31</li>
+                          </ul>
+
+
+                        </div>
+
+                      </div>
+                    </div>
+                  </div> <!-- card-body .// -->
+        </article> <!-- order-group.// -->
+      </main>
+    </div> <!-- row.// -->
+  </div>
+
+
+
+
+</section>
+
+
+{% endblock %}
