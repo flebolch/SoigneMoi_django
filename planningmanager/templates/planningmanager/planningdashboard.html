@@ -37,7 +37,7 @@
                     <div class="card-body">
                       <form action="{% url 'newDoctor' %}" method="post">
                         {% csrf_token %}
-                        <div class="d-flex flex-column flex-lg-row justify-content-around">
+                        <div class="d-flex flex-column flex-sm-row justify-content-around">
 
                           <div class="form-group px-2">
                             <label>Choix du docteur</label>
@@ -72,8 +72,8 @@
                   </div>
 
 
-                  </head>
 
+                  <p name="calendarValue" hidden></p>
                   <body>
                     <div id='calendar'></div>
                   </body>
@@ -81,7 +81,7 @@
                   <div class="col-md-12 pt-3">
                     <div class="card" style="text-align:center;">
                       <div class="card-body">
-                        <h5 class="card-title>Légende</h5>
+                        <h5 class="card-title">Légende</h5>
                         <div class="d-flex flex-column flex-lg-row justify-content-around">
                           <div class="form-group px-2">
                             <table>
@@ -91,13 +91,17 @@
                                 <td><span class="badge bg-warning">Rendez-vous</span></td>
                               </tr>
                             </table>
-                          </div> 
-                          <hr>
-                          <div calss="form-group px-10">
-                            <h4>Sélectionnez les jours pour lesquelles vous souhaitez ajoutez de nouveau créneaux de rendez-vous.</h4>
-                            <br>
-                            <button type="submit" name="addSelected" class="btn btn-primary">Enregistrer</button> 
-                      </div>
+                          </div>
+                        </div> 
+                          <div>
+
+                            <hr>
+                            <div calss="form-group px-10">
+                              <h5>Sélectionnez les jours pour lesquelles vous souhaitez ajoutez de nouveau créneaux de rendez-vous.</h5>
+                              <br>
+                              <button type="submit" name="addSelected" class="btn btn-primary">Enregistrer</button> 
+                            </div>
+                          </div>
                     </div>
                   </div>
 

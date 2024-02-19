@@ -16,57 +16,49 @@ $(document).ready(function () {
   }
   var csrftoken = getCookie("csrftoken");
 
-  // Add a click event listener to the document
-  document.addEventListener("click", function (event) {
-    // Check if the clicked element has the class daySelected
-    if (event.target.classList.contains("daySelected")) {
-      // Get the text within the span
-      var content = this.textContent;
+ 
+  // var buttonSelected = $("button[name='addSelected']");
 
-      // Replace the span with its text content
-      this.innerHTML = content;
-    }
-  });
-
-  var buttonSelected = $("button[name='addSelected']");
-
-  buttonSelected.click(function () {
-    //put all date in an array
-    var dates = [];
-    var tds = document.getElementsByTagName("td");
-    for (var i = 0; i < tds.length; i++) {
-      if (tds[i].getElementsByClassName("daySelected").length === 1) {
-        dates.push(tds[i].textContent);
-      }
-    }
-    //if the array is not empty send the dates to the server
-    if (dates.length > 0) {
-      $.ajax({
-        type: "POST",
-        url: "/add-appointment/",
-        headers: { "X-CSRFToken": csrftoken },
-        data: {
-          dates: dates,
-          doctor_id: doctor_id,
-          dateStr: dateStr,
-        },
-        success: function (response) {
-          console.log(response);
-          if (response.status === "success") {
-            alert("Rendez-vous ajouté avec succès");
-            location.reload();
-          } else {
-            alert("Une erreur s'est produite lors de l'ajout du rendez-vous");
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.error("Error: " + textStatus, errorThrown);
-        },
-      });
-    } else {
-      alert("Veuillez sélectionner au moins une date");
-    }
-  });
+  // buttonSelected.click(function () {
+  //   //put all date in an array
+  //   var dates = [];
+  //   var tds = document.getElementsByTagName("td");
+  //   for (var i = 0; i < tds.length; i++) {
+  //     if (tds[i].getElementsByClassName("daySelected").length === 1) {
+  //       dates.push(tds[i].textContent);
+  //     }
+  //   }
+  //   console.log(dates);
+  //   console.log(doctor_id);
+  //   console.log(dateStr);
+  //   //if the array is not empty send the dates to the server
+  //   if (dates.length > 0) {
+  //     $.ajax({
+  //       type: "POST",
+  //       url: "/add-appointment/",
+  //       headers: { "X-CSRFToken": csrftoken },
+  //       data: {
+  //         dates: dates,
+  //         doctor_id: doctor_id,
+  //         dateStr: dateStr,
+  //       },
+  //       success: function (response) {
+  //         console.log(response);
+  //         if (response.status === "success") {
+  //           alert("Rendez-vous ajouté avec succès");
+  //           location.reload();
+  //         } else {
+  //           alert("Une erreur s'est produite lors de l'ajout du rendez-vous");
+  //         }
+  //       },
+  //       error: function (jqXHR, textStatus, errorThrown) {
+  //         console.error("Error: " + textStatus, errorThrown);
+  //       },
+  //     });
+  //   } else {
+  //     alert("Veuillez sélectionner au moins une date");
+  //   }
+  // });
 
   // Get doctor's planning
   var doctor_id = $("#doctor_id").val();
@@ -107,6 +99,7 @@ $(document).ready(function () {
   }
 
   function fetchCalendar(dateStr, doctor_id) {
+    $('p[name="calendarValue"]').text(dateStr);
     $.ajax({
       url: "/selectedMonth/" + dateStr + "/" + doctor_id + "/",
       type: "GET",
@@ -163,9 +156,15 @@ $(document).ready(function () {
             var day = parseInt(content);
             if (!isNaN(day) && day >= 1 && day <= 31) {
               // Add a span with the class daySelected around the td's content
+              var content = this.textContent;
               this.innerHTML =
                 '<span class="daySelected">' + content + "</span>";
             }
+          } else if (this.getElementsByClassName("daySelected").length === 1) {
+            // Remove the span with the class daySelected
+            var content = this.textContent;
+            console.log(content);
+            this.innerHTML = content;
           }
         });
       }
@@ -225,4 +224,50 @@ $(document).ready(function () {
     // Return the new date string
     return year + "-" + month;
   }
+
+  var buttonSelected = $("button[name='addSelected']");
+
+  buttonSelected.click(function () {
+    //put all date in an array
+    var dates = [];
+    var tds = document.getElementsByTagName("td");
+    var dateCale = document.querySelector(
+      'p[name="calendarValue"]'
+    ).textContent;
+    for (var i = 0; i < tds.length; i++) {
+      if (tds[i].getElementsByClassName("daySelected").length === 1) {
+        dates.push(tds[i].textContent);
+      }
+    }
+    console.log("dates:", dates);
+    console.log("doctor id:", doctor_id);
+    console.log("dateCale:", dateCale);
+    //if the array is not empty send the dates to the server
+    if (dates.length > 0) {
+      $.ajax({
+        type: "POST",
+        url: "/add-appointment/",
+        headers: { "X-CSRFToken": csrftoken },
+        data: {
+          dates: dates,
+          doctor_id: doctor_id,
+          dateStr: dateStr,
+        },
+        success: function (response) {
+          console.log(response);
+          if (response.status === "success") {
+            alert("Rendez-vous ajouté avec succès");
+            location.reload();
+          } else {
+            alert("Une erreur s'est produite lors de l'ajout du rendez-vous");
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Error: " + textStatus, errorThrown);
+        },
+      });
+    } else {
+      alert("Veuillez sélectionner au moins une date");
+    }
+  });
 });

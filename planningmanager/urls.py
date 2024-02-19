@@ -8,5 +8,6 @@ urlpatterns = [
     path('gestion-des-planning/', views.planningdashboard, name='planningdashboard'),
     #Data from Ajax request
     path('get-doctorsProfile/<int:doctor>/', getDoctorProfile.as_view(), name='doctorProfile'),  # Use the imported view
-    path('selectedMonth/<str:date>/<int:doctor>/', monthCalendar.as_view(), name='month')
+    path('selectedMonth/<str:date>/<int:doctor>/', monthCalendar.as_view(), name='month'),
+    path('add-appointment/', views.saveAppointment, name='saveAppointment'),
 ]

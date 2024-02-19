@@ -184,3 +184,14 @@ def generateMatricule(first_name, last_name):
 def listDoctors(request):
     doctors = DoctorProfile.objects.all()
     return render(request, 'planningmanager/listdoctors.html', {'doctors': doctors})
+
+
+def saveAppointment(request):
+    if request.method == 'POST':
+        doctor = request.POST.get('doctor')
+        date = request.POST.get('date')
+        print('date:', date)
+        mount = request.POST.get('mount')
+        year =  request.POST.get('year')  
+        print('year:', year)
+        
